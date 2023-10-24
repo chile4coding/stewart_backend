@@ -31,7 +31,7 @@ cloudinary.config({
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors({ credentials: true, origin: "*" }));
+// app.use(cors({ credentials: true, origin: "*" }));
 app.use(cors(corsOpts));
 
 app.use(requestHeaders)

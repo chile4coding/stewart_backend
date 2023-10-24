@@ -28,8 +28,8 @@ router.post(
 );
 
 router.post(
-  "/create_category/:name/:productImage",
-  [param("name").isEmpty()],
+  "/create_category",
+  [check("name").isEmpty(), check("productImage")],
   auth,
   createCategory
 );

@@ -19,7 +19,7 @@ export const createCategory = expressAsyncHandler(
 
     try {
     
-        const { name, productImage } = req.params;
+        const { name, productImage } = req.body;
         const admin = await prisma.admin.findUnique({
           where: {
             id: authId,

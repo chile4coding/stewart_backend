@@ -18,11 +18,8 @@ export const createCategory = expressAsyncHandler(
     const authId = req.authId;
 
     try {
-      if ("file" in req) {
-        if (!req.path) {
-          throwError("file is requiered", StatusCodes.BAD_REQUEST, true);
-        }
-        const { name } = req.params;
+    
+        const { name, productImage } = req.params;
         const admin = await prisma.admin.findUnique({
           where: {
             id: authId,
@@ -31,10 +28,10 @@ export const createCategory = expressAsyncHandler(
         if (!admin) {
           throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
         }
-        console.log("get the admon user ====================", admin);
+      
         const { url: image_url } = await uploadImage(req.file?.path as string);
 
-        console.log("this is the image url =====================", image_url);
+    
         
         let productCategory;
         productCategory = await prisma.category.findFirst({
@@ -50,18 +47,18 @@ export const createCategory = expressAsyncHandler(
             },
             data: {
               name: name,
-              image: image_url,
+              image: productImage,
             },
           });
-          console.log("update product category=====================", productCategory);
+        
         } else {
           productCategory = await prisma.category.create({
             data: {
               name: name,
-              image: image_url,
+              image: productImage,
             },
           });
-        }
+        
         console.log("created product categhory=====================", productCategory);
         
         res.status(StatusCodes.OK).json({

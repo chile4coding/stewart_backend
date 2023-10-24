@@ -15,7 +15,7 @@ const productUploadFolder = (0, multer_1.default)({ dest: "products_image/" });
 // const adminImageFolder = multer({ dest: "admin_image/" });
 router.post("/create_admin", [(0, express_validator_1.check)("email").isEmail().isEmpty(), (0, express_validator_1.check)("password").isEmpty()], admin_controller_1.createAdmin);
 router.post("/login_admin", [(0, express_validator_1.check)("email").isEmail().isEmpty(), (0, express_validator_1.check)("password").isEmpty()], admin_controller_1.loginAdmin);
-router.post("/create_category/:name", [(0, express_validator_1.param)("name").isEmpty()], auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createCategory);
+router.post("/create_category/:name/:productImage", [(0, express_validator_1.param)("name").isEmpty()], auth_1.default, product_controller_admin_1.createCategory);
 router.post("/create_product/:categoryId/:name/:price/:salesPrice/:discount/:initialSize/:initialColor/:description/:productId", auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createOrUpdateProduct);
 router.post("/create_size/:name/:productId", auth_1.default, product_controller_admin_1.createOrUpdateSize);
 router.post("/create_cloth_color/:name/:price/:discount/:sizeId/:sales_price/:colorId", auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createOrUpdateClothColor);

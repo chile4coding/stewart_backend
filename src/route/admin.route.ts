@@ -28,10 +28,9 @@ router.post(
 );
 
 router.post(
-  "/create_category/:name",
+  "/create_category/:name/:productImage",
   [param("name").isEmpty()],
   auth,
-  productUploadFolder.single("image"),
   createCategory
 );
 

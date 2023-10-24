@@ -26,48 +26,40 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
     }
     const authId = req.authId;
     try {
-        if ("file" in req) {
-            if (!req.path) {
-                (0, helpers_1.throwError)("file is requiered", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
-            }
-            const { name } = req.params;
-            const admin = yield prisma_client_1.default.admin.findUnique({
+        const { name, productImage } = req.params;
+        const admin = yield prisma_client_1.default.admin.findUnique({
+            where: {
+                id: authId,
+            },
+        });
+        if (!admin) {
+            (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const { url: image_url } = yield (0, helpers_1.uploadImage)((_a = req.file) === null || _a === void 0 ? void 0 : _a.path);
+        let productCategory;
+        productCategory = yield prisma_client_1.default.category.findFirst({
+            where: {
+                name: name,
+            },
+        });
+        if (productCategory) {
+            yield prisma_client_1.default.category.update({
                 where: {
-                    id: authId,
+                    id: productCategory.id,
                 },
-            });
-            if (!admin) {
-                (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
-            }
-            console.log("get the admon user ====================", admin);
-            const { url: image_url } = yield (0, helpers_1.uploadImage)((_a = req.file) === null || _a === void 0 ? void 0 : _a.path);
-            console.log("this is the image url =====================", image_url);
-            let productCategory;
-            productCategory = yield prisma_client_1.default.category.findFirst({
-                where: {
+                data: {
                     name: name,
+                    image: productImage,
                 },
             });
-            if (productCategory) {
-                yield prisma_client_1.default.category.update({
-                    where: {
-                        id: productCategory.id,
-                    },
-                    data: {
-                        name: name,
-                        image: image_url,
-                    },
-                });
-                console.log("update product category=====================", productCategory);
-            }
-            else {
-                productCategory = yield prisma_client_1.default.category.create({
-                    data: {
-                        name: name,
-                        image: image_url,
-                    },
-                });
-            }
+        }
+        else {
+            productCategory = yield prisma_client_1.default.category.create({
+                data: {
+                    name: name,
+                    image: productImage,
+                },
+            });
             console.log("created product categhory=====================", productCategory);
             res.status(http_status_codes_1.StatusCodes.OK).json({
                 productCategory,

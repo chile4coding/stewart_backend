@@ -31,14 +31,14 @@ router.post(
 );
 
 router.post(
-  "/create_product/:categoryId/:name/:price/:salesPrice/:discount/:initialSize/:initialColor/:description/:image_url/:productId",
+  "/create_product",
   auth,
 
   createOrUpdateProduct
 );
-router.post("/create_size/:name/:productId", auth, createOrUpdateSize);
+router.post("/create_size", auth, createOrUpdateSize);
 router.post(
-  "/create_cloth_color/:name/:price/:discount/:sizeId/:sales_price/:image_url/:colorId",
+  "/create_cloth_color",
   auth,
 
   createOrUpdateClothColor

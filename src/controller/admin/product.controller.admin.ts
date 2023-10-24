@@ -63,11 +63,6 @@ export const createCategory = expressAsyncHandler(
 
 export const createOrUpdateProduct = expressAsyncHandler(
   async (req: Request | any, res, next) => {
-    const errors = validationResult(req.params);
-
-    if (!errors.isEmpty()) {
-      throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
-    }
 
     const {
       categoryId,
@@ -80,7 +75,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
       productId,
       salesPrice,
       image_url,
-    } = req.params;
+    } = req.body;
 
     const authId = req.authId;
 
@@ -180,7 +175,7 @@ export const createOrUpdateSize = expressAsyncHandler(
     }
     const authId = req.authId;
 
-    const { name, productId } = req.params;
+    const { name, productId } = req.body
 
     try {
       const admin = await prisma.admin.findUnique({
@@ -212,11 +207,6 @@ export const createOrUpdateSize = expressAsyncHandler(
 );
 export const createOrUpdateClothColor = expressAsyncHandler(
   async (req: Request | any, res, next) => {
-    const errors = validationResult(req.params);
-
-    if (!errors.isEmpty()) {
-      throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
-    }
     const authId = req.authId;
     try {
       
@@ -229,7 +219,7 @@ export const createOrUpdateClothColor = expressAsyncHandler(
           sizeId,
           sales_price,
           image_url,
-        } = req.params;
+        } = req.body;
         const subscriberPrice: number = Number(
           (price - Number(price) * (Number(discount) / 100)).toFixed(2)
         );

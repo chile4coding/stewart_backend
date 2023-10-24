@@ -9,7 +9,7 @@ import { url } from "inspector";
 
 export const createCategory = expressAsyncHandler(
   async (req: Request | any, res, next) => {
-    const errors = validationResult(req.params);
+    const errors = validationResult(req.body);
 
    
     if (!errors.isEmpty()) {

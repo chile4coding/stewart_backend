@@ -28,10 +28,7 @@ export const createCategory = expressAsyncHandler(
         if (!admin) {
           throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
         }
-      
-        const { url: image_url } = await uploadImage(req.file?.path as string);
-
-    
+       
         
         let productCategory;
         productCategory = await prisma.category.findFirst({

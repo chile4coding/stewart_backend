@@ -4,6 +4,8 @@ import {
   createOrUpdateClothColor,
   createOrUpdateProduct,
   createOrUpdateSize,
+  removeAProduct,
+  removeAProductColor,
 } from "../controller/admin/product.controller.admin";
 import { createAdmin, loginAdmin } from "../controller/admin/admin.controller";
 
@@ -37,6 +39,24 @@ router.post(
   createOrUpdateProduct
 );
 router.post("/create_size", auth, createOrUpdateSize);
+router.post(
+  "/create_cloth_color",
+  auth,
+
+  createOrUpdateClothColor
+);
+router.delete(
+  "/delete_product",
+  [body("productId").isEmpty()],
+  auth,
+  removeAProduct
+);
+router.delete(
+  "/delete_color",
+  [body("productColorId").isEmpty()],
+  auth,
+  removeAProductColor
+);
 router.post(
   "/create_cloth_color",
   auth,

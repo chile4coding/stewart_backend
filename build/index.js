@@ -16,13 +16,16 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_client_1 = __importDefault(require("./configuration/prisma-client"));
 const errorhandler_1 = __importDefault(require("./middleware/errorhandler"));
-const requestHeader_1 = __importDefault(require("./middleware/requestHeader"));
+// import requestHeaders from "./middleware/requestHeader";
 const body_parser_1 = __importDefault(require("body-parser"));
 const cloudinary_1 = require("cloudinary");
 const cors_1 = __importDefault(require("cors"));
 const route_1 = __importDefault(require("./route/route"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)({
+    origin: "*",
+}));
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -30,8 +33,8 @@ cloudinary_1.v2.config({
 });
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
-app.use((0, cors_1.default)({ credentials: true, origin: "*" }));
-app.use(requestHeader_1.default);
+// app.use(cors({ credentials: true, origin: "*" }));
+// app.use(requestHeaders)
 app.use(errorhandler_1.default);
 app.use(route_1.default);
 class CreateDBConnect {

@@ -7,7 +7,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 export default (req: Request | any, res: Response, next: NextFunction) => {
-  console.log(req)
+
   try {
     const authHeader = req.get("Authorization");
 

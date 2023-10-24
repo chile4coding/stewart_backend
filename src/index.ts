@@ -15,14 +15,7 @@ dotenv.config();
 
 const app = express();
 
-const corsOpts = {
-  origin: "*",
-
-  methods: ["GET", "POST","PUT","DELETE","PATCH"],
-
-  allowedHeaders: ["Content-Type"],
-};
-
+c
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -31,8 +24,14 @@ cloudinary.config({
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  cors({
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    origin: "*",
+  })
+);
 // app.use(cors({ credentials: true, origin: "*" }));
-app.use(cors(corsOpts));
 
 app.use(requestHeaders)
 app.use(errorHandler)

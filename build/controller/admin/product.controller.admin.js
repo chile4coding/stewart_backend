@@ -36,10 +36,10 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
                     id: authId,
                 },
             });
-            console.log("get the admon user ====================", admin);
             if (!admin) {
                 (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
             }
+            console.log("get the admon user ====================", admin);
             const { url: image_url } = yield (0, helpers_1.uploadImage)((_a = req.file) === null || _a === void 0 ? void 0 : _a.path);
             console.log("this is the image url =====================", image_url);
             let productCategory;

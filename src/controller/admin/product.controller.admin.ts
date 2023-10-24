@@ -28,10 +28,10 @@ export const createCategory = expressAsyncHandler(
             id: authId,
           },
         });
-        console.log("get the admon user ====================", admin);
         if (!admin) {
           throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
         }
+        console.log("get the admon user ====================", admin);
         const { url: image_url } = await uploadImage(req.file?.path as string);
 
         console.log("this is the image url =====================", image_url);

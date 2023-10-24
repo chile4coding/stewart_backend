@@ -11,57 +11,50 @@ export const createCategory = expressAsyncHandler(
   async (req: Request | any, res, next) => {
     const errors = validationResult(req.body);
 
-   
     if (!errors.isEmpty()) {
       throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
     }
     const authId = req.authId;
 
     try {
-    
-        const { name, productImage } = req.body;
-        const admin = await prisma.admin.findUnique({
+      const { name, productImage } = req.body;
+      const admin = await prisma.admin.findUnique({
+        where: {
+          id: authId,
+        },
+      });
+      if (!admin) {
+        throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+      }
+
+      let productCategory;
+      productCategory = await prisma.category.findFirst({
+        where: {
+          name: name,
+        },
+      });
+
+      if (productCategory) {
+        await prisma.category.update({
           where: {
-            id: authId,
+            id: productCategory.id,
           },
-        });
-        if (!admin) {
-          throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
-        }
-       
-        
-        let productCategory;
-        productCategory = await prisma.category.findFirst({
-          where: {
+          data: {
             name: name,
+            image: productImage,
           },
         });
-        console.log("created product categhory=====================", productCategory);
-        
-        if (productCategory) {
-          await prisma.category.update({
-            where: {
-              id: productCategory.id,
-            },
-            data: {
-              name: name,
-              image: productImage,
-            },
-          });
-        
-        } else {
-          productCategory = await prisma.category.create({
-            data: {
-              name: name,
-              image: productImage,
-            },
-          });
-        
-        
-        res.status(StatusCodes.OK).json({
-          productCategory,
+      } else {
+        productCategory = await prisma.category.create({
+          data: {
+            name: name,
+            image: productImage,
+          },
         });
       }
+      res.status(StatusCodes.OK).json({
+        productCategory,
+      });
     } catch (error) {
       next(error);
     }
@@ -86,15 +79,14 @@ export const createOrUpdateProduct = expressAsyncHandler(
       description,
       productId,
       salesPrice,
+      image_url,
     } = req.params;
 
     const authId = req.authId;
 
     try {
-      if ("file" in req) {
-        if (!req.path) {
-          throwError("file is requiered", StatusCodes.BAD_REQUEST, true);
-        }
+ 
+   
 
         const subscriberPrice: number = Number(
           (price - Number(price) * (Number(discount) / 100)).toFixed(2)
@@ -109,8 +101,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
         if (!admin) {
           throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
         }
-        const { url: image_url } = await uploadImage(req.file?.path as string);
-
+     
         const productCategory = await prisma.category.findUnique({
           where: {
             id: categoryId,
@@ -173,7 +164,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
             product,
           });
         }
-      }
+      
     } catch (error) {
       next(error);
     }
@@ -188,10 +179,8 @@ export const createOrUpdateSize = expressAsyncHandler(
       throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
     }
     const authId = req.authId;
-   
-    const { name, productId } = req.params;
 
-    
+    const { name, productId } = req.params;
 
     try {
       const admin = await prisma.admin.findUnique({
@@ -230,12 +219,17 @@ export const createOrUpdateClothColor = expressAsyncHandler(
     }
     const authId = req.authId;
     try {
-      if ("file" in req) {
-        if (!req.path) {
-          throwError("file is requiered", StatusCodes.BAD_REQUEST, true);
-        }
-        const { name, price, discount, colorId, sizeId, sales_price } =
-          req.params;
+      
+   
+        const {
+          name,
+          price,
+          discount,
+          colorId,
+          sizeId,
+          sales_price,
+          image_url,
+        } = req.params;
         const subscriberPrice: number = Number(
           (price - Number(price) * (Number(discount) / 100)).toFixed(2)
         );
@@ -249,7 +243,7 @@ export const createOrUpdateClothColor = expressAsyncHandler(
         }
         const p = Number(Number(price).toFixed(2));
         const pr = parseFloat(p.toFixed(2));
-        const { url: image_url } = await uploadImage(req.file?.path as string);
+     
         console.log(colorId);
         let color;
         if (colorId.trim().length > 2) {
@@ -266,7 +260,7 @@ export const createOrUpdateClothColor = expressAsyncHandler(
             data: {
               name: name,
               price: pr,
-              sales_price:Number(sales_price),
+              sales_price: Number(sales_price),
               size_id: sizeId,
               discount: parseFloat(Number(discount).toFixed(2)),
               subscriber_price: parseFloat(subscriberPrice.toFixed(2)),
@@ -282,7 +276,7 @@ export const createOrUpdateClothColor = expressAsyncHandler(
             data: {
               name: name,
               price: pr,
-              sales_price:Number(sales_price),
+              sales_price: Number(sales_price),
               size: { connect: { id: sizeId } },
               discount: parseFloat(Number(discount).toFixed(2)),
               subscriber_price: parseFloat(subscriberPrice.toFixed(2)),
@@ -294,7 +288,7 @@ export const createOrUpdateClothColor = expressAsyncHandler(
             color,
           });
         }
-      }
+      
     } catch (error) {
       next(error);
     }

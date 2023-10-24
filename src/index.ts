@@ -4,17 +4,20 @@ import { PrismaClient } from "@prisma/client";
 import prisma from "./configuration/prisma-client";
 import errorHandler from "./middleware/errorhandler";
 // import requestHeaders from "./middleware/requestHeader";
-import bodyParser from  "body-parser"
+import bodyParser from "body-parser";
 import { v2 as cloudinary } from "cloudinary";
 
-
-import cors from "cors"
+import cors from "cors";
 import router from "./route/route";
 
 dotenv.config();
 
 const app = express();
-
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -23,18 +26,12 @@ cloudinary.config({
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(
-  cors({
-    credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    origin: "*",
-  })
-);
+
 // app.use(cors({ credentials: true, origin: "*" }));
 
 // app.use(requestHeaders)
-app.use(errorHandler)
-app.use(router)
+app.use(errorHandler);
+app.use(router);
 
 class CreateDBConnect {
   db: PrismaClient;

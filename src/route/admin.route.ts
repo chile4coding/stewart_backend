@@ -12,10 +12,6 @@ import { param, body, check } from "express-validator";
 import auth from "../middleware/auth";
 const router = Router();
 
-import multer from "multer";
-
-const productUploadFolder = multer({ dest: "products_image/" });
-// const adminImageFolder = multer({ dest: "admin_image/" });
 router.post(
   "/create_admin",
   [check("email").isEmail().isEmpty(), check("password").isEmpty()],
@@ -35,16 +31,16 @@ router.post(
 );
 
 router.post(
-  "/create_product/:categoryId/:name/:price/:salesPrice/:discount/:initialSize/:initialColor/:description/:productId",
+  "/create_product/:categoryId/:name/:price/:salesPrice/:discount/:initialSize/:initialColor/:description/:image_url/:productId",
   auth,
-  productUploadFolder.single("image"),
+
   createOrUpdateProduct
 );
 router.post("/create_size/:name/:productId", auth, createOrUpdateSize);
 router.post(
-  "/create_cloth_color/:name/:price/:discount/:sizeId/:sales_price/:colorId",
+  "/create_cloth_color/:name/:price/:discount/:sizeId/:sales_price/:image_url/:colorId",
   auth,
-  productUploadFolder.single("image"),
+
   createOrUpdateClothColor
 );
 

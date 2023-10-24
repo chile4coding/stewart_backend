@@ -11,12 +11,14 @@ dotenv_1.default.config();
 exports.default = (req, res, next) => {
     try {
         const authHeader = req.get("Authorization");
+        console.log("This is the heqder  =========================== ", authHeader);
         if (!authHeader) {
             (0, helpers_1.throwError)("No token provided", http_status_codes_1.StatusCodes.UNAUTHORIZED);
         }
         let decode;
         const token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.split(" ")[1];
         decode = jsonwebtoken_1.default.verify(token, `${process.env.JWT_SECRET_KEY}`);
+        console.log("This is the decoded   =========================== ", decode);
         if (!token || !decode) {
             (0, helpers_1.throwError)("Invalid token", http_status_codes_1.StatusCodes.UNAUTHORIZED);
         }

@@ -9,7 +9,10 @@ dotenv.config()
 export default (req: Request | any, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.get("Authorization");
+
+    console.log("This is the heqder  =========================== ", authHeader)
    
+    
     if (!authHeader) {
       throwError("No token provided", StatusCodes.UNAUTHORIZED);
     }
@@ -19,8 +22,9 @@ export default (req: Request | any, res: Response, next: NextFunction) => {
       token as string,
       `${process.env.JWT_SECRET_KEY}`
       )
- 
-
+      
+      
+      console.log("This is the decoded   =========================== ", decode)
   
 
     if (!token || !decode) {

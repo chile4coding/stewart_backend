@@ -9,6 +9,7 @@ const helpers_1 = require("../helpers");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 exports.default = (req, res, next) => {
+    console.log(req);
     try {
         const authHeader = req.get("Authorization");
         console.log("This is the heqder  =========================== ", authHeader);

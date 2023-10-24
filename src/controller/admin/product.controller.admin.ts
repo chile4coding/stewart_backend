@@ -11,7 +11,7 @@ export const createCategory = expressAsyncHandler(
   async (req: Request | any, res, next) => {
     const errors = validationResult(req.params);
 
-    console.log(req.file);
+   
     if (!errors.isEmpty()) {
       throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
     }
@@ -28,18 +28,21 @@ export const createCategory = expressAsyncHandler(
             id: authId,
           },
         });
+        console.log("get the admon user ====================", admin);
         if (!admin) {
           throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
         }
         const { url: image_url } = await uploadImage(req.file?.path as string);
 
+        console.log("this is the image url =====================", image_url);
+        
         let productCategory;
         productCategory = await prisma.category.findFirst({
           where: {
             name: name,
           },
         });
-
+        
         if (productCategory) {
           await prisma.category.update({
             where: {
@@ -50,6 +53,7 @@ export const createCategory = expressAsyncHandler(
               image: image_url,
             },
           });
+          console.log("update product category=====================", productCategory);
         } else {
           productCategory = await prisma.category.create({
             data: {
@@ -58,7 +62,8 @@ export const createCategory = expressAsyncHandler(
             },
           });
         }
-
+        console.log("created product categhory=====================", productCategory);
+        
         res.status(StatusCodes.OK).json({
           productCategory,
         });

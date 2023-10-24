@@ -21,7 +21,6 @@ const prisma_client_1 = __importDefault(require("../../configuration/prisma-clie
 exports.createCategory = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const errors = (0, express_validator_1.validationResult)(req.params);
-    console.log(req.file);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
@@ -37,10 +36,12 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
                     id: authId,
                 },
             });
+            console.log("get the admon user ====================", admin);
             if (!admin) {
                 (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
             }
             const { url: image_url } = yield (0, helpers_1.uploadImage)((_a = req.file) === null || _a === void 0 ? void 0 : _a.path);
+            console.log("this is the image url =====================", image_url);
             let productCategory;
             productCategory = yield prisma_client_1.default.category.findFirst({
                 where: {
@@ -57,6 +58,7 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
                         image: image_url,
                     },
                 });
+                console.log("update product category=====================", productCategory);
             }
             else {
                 productCategory = yield prisma_client_1.default.category.create({
@@ -66,6 +68,7 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
                     },
                 });
             }
+            console.log("created product categhory=====================", productCategory);
             res.status(http_status_codes_1.StatusCodes.OK).json({
                 productCategory,
             });

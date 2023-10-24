@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import prisma from "./configuration/prisma-client";
 import errorHandler from "./middleware/errorhandler";
-import requestHeaders from "./middleware/requestHeader";
+// import requestHeaders from "./middleware/requestHeader";
 import bodyParser from  "body-parser"
 import { v2 as cloudinary } from "cloudinary";
 
@@ -32,7 +32,7 @@ app.use(
 );
 // app.use(cors({ credentials: true, origin: "*" }));
 
-app.use(requestHeaders)
+// app.use(requestHeaders)
 app.use(errorHandler)
 app.use(router)
 

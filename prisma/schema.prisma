@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,18 +21,20 @@ model Category{
   product Product[]
 }
 
-model Product{'
+model Product{
 id String @id @default(uuid())
 name String?
+categoryName String?
 image String?
-price Int
-discount Int
-initial_size String
-subscriber_price Int
-initial_color String
-description String
+price Float?
+sales_price Float?
+discount Float?
+initial_size String?
+subscriber_price Float?
+initial_color String?
+description String?
+category_id String 
 category Category @relation(fields: [category_id], references:[id])
-category_id String @unique
 size Size[]
 reviews Review[]
 }
@@ -40,13 +42,8 @@ reviews Review[]
 model Size{
   id  String @id @default(uuid())
   name String
-  image String?
-  initial_color String
-  discount String
-  subscriber_price Int
-  price Int
-  procut Product @relation(fields: [product_id], references:[id])
-  product_id String @unique
+  product Product? @relation(fields: [product_id], references:[id])
+  product_id String?
 colors Color[]
 
 }
@@ -55,44 +52,49 @@ model Color{
   id String @id @default(uuid())
   name String 
   image String?
-  price Int
-  discount Int
-  subscriber_price Int
-size Size @relation(fields: [size_id], references: [id])
-size_id String @unique
+  sales_price Float?
+  price Float
+  discount Float
+  subscriber_price Float
+size Size? @relation(fields: [size_id], references: [id])
+size_id String?
+save_item SaveItem[]
 }
 
 model User{
   id String @id @default(uuid())
-  first_name String
-  last_name String
-  email String? @unique
-  phone String
+ 
+name String
+  email String @unique
+  gender String?
+  phone String?
   passwords String
-  city String
-  state String
-  country String
-  address String
-  avatar String
+  dob String
+  city String?
+  state String?
+  country String?
+  address String?
+  avatar String?
   review Review[]
   inbox Inbox[]
   wallet Wallet?
   orders Order[]
-
+  is_varified Boolean @default(false)
+save_items SaveItem[]
 }
 
 model Review{
   id String @id @default(uuid())
   rating Int
-  date DateTime
+  date DateTime 
   name String
-  is_verified Boolean
+  is_verified Boolean @default(false)
   comment String
   avatar String
   product Product @relation(fields: [product_id], references: [id])
   product_id String 
   user User @relation(fields: [user_id], references: [id])
-  user_id String @unique
+  user_id String 
 
 }
 
@@ -101,12 +103,12 @@ model Inbox{
   date DateTime
   message String
   user User @relation(fields: [user_id], references: [id])
-  user_id String @unique
+  user_id String 
 }
 
 model Wallet{
   id String @id @default(uuid())
-  amount Int
+  amount Float @default(0)
   user User @relation(fields: [user_id], references: [id])
   user_id String @unique
 }
@@ -114,14 +116,28 @@ model Wallet{
 model Order {
   id      String   @id @default(uuid())
   status  Status   @default(pending)
+  name String?
+  state String?
+  city String?
+  address String?
+  country String?
+  phone String?
+  refNo String?
   orderitem Json
   user    User ?    @relation(fields: [user_id], references: [id])
-  user_id String?  @unique
-  total Float
-  tax Float
-  shipping Float
-  arrivalDate String
-  
+  user_id String?  
+  total Float?
+  tax Float?
+  shipping Float?
+  arrivalDate String?
+}
+
+model SaveItem{
+  id String @id @default(uuid())
+  user    User ?    @relation(fields: [user_id], references: [id])
+  user_id String? @unique
+  item Color ?  @relation(fields: [item_id], references: [id])
+  item_id String? 
 }
 
 
@@ -129,4 +145,19 @@ enum Status{
   pending
   success
   cancelled
+}
+
+model Admin{
+  id String @id @default(uuid())
+name String?
+password String
+first_name String?
+last_name String?
+phone_number String?
+country String?
+state String?
+email String @unique
+avatar_url String?
+
+
 }

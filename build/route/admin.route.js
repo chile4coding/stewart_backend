@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminRoute = void 0;
+const express_1 = require("express");
+const product_controller_admin_1 = require("../controller/admin/product.controller.admin");
+const admin_controller_1 = require("../controller/admin/admin.controller");
+const express_validator_1 = require("express-validator");
+const auth_1 = __importDefault(require("../middleware/auth"));
+const router = (0, express_1.Router)();
+const multer_1 = __importDefault(require("multer"));
+const productUploadFolder = (0, multer_1.default)({ dest: "products_image/" });
+// const adminImageFolder = multer({ dest: "admin_image/" });
+router.post("/create_admin", [(0, express_validator_1.check)("email").isEmail().isEmpty(), (0, express_validator_1.check)("password").isEmpty()], admin_controller_1.createAdmin);
+router.post("/login_admin", [(0, express_validator_1.check)("email").isEmail().isEmpty(), (0, express_validator_1.check)("password").isEmpty()], admin_controller_1.loginAdmin);
+router.post("/create_category/:name", [(0, express_validator_1.param)("name").isEmpty()], auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createCategory);
+router.post("/create_product/:categoryId/:name/:price/:salesPrice/:discount/:initialSize/:initialColor/:description/:productId", auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createOrUpdateProduct);
+router.post("/create_size/:name/:productId", auth_1.default, product_controller_admin_1.createOrUpdateSize);
+router.post("/create_cloth_color/:name/:price/:discount/:sizeId/:sales_price/:colorId", auth_1.default, productUploadFolder.single("image"), product_controller_admin_1.createOrUpdateClothColor);
+exports.adminRoute = router;

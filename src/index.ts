@@ -14,6 +14,16 @@ import router from "./route/route";
 dotenv.config();
 
 const app = express();
+
+const corsOpts = {
+  origin: "*",
+
+  methods: ["GET", "POST","PUT","DELETE","PATCH"],
+
+  allowedHeaders: ["Content-Type"],
+};
+
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -22,6 +32,7 @@ cloudinary.config({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ credentials: true, origin: "*" }));
+app.use(cors(corsOpts));
 
 app.use(requestHeaders)
 app.use(errorHandler)

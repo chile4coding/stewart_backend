@@ -36,6 +36,7 @@ export const createCategory = expressAsyncHandler(
             name: name,
           },
         });
+        console.log("created product categhory=====================", productCategory);
         
         if (productCategory) {
           await prisma.category.update({
@@ -56,7 +57,6 @@ export const createCategory = expressAsyncHandler(
             },
           });
         
-        console.log("created product categhory=====================", productCategory);
         
         res.status(StatusCodes.OK).json({
           productCategory,

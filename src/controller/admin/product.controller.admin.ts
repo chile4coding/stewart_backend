@@ -170,7 +170,7 @@ export const createOrUpdateSize = expressAsyncHandler(
     }
     const authId = req.authId;
 
-    const { name, productId } = req.body;
+    const { name, productId, waist, length, sleaves } = req.body;
 
     try {
       const admin = await prisma.admin.findUnique({
@@ -188,11 +188,14 @@ export const createOrUpdateSize = expressAsyncHandler(
       const size = await prisma.size.create({
         data: {
           name: name,
+          waist : Number(waist),
+          length: Number(length),
+          sleaves: Number(sleaves),
           product:{connect:{id:productId}}
         },
       });
       res.status(StatusCodes.CREATED).json({
-        message: "product added successfully",
+        message: "product size added successfully",
         size,
       });
     } catch (error) {

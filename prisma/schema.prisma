@@ -32,6 +32,7 @@ discount Float?
 initial_size String?
 subscriber_price Float?
 initial_color String?
+short_desc String?
 description String?
 category_id String 
 category Category @relation(fields: [category_id], references:[id])
@@ -44,7 +45,7 @@ model Size{
   name String
   waist String?
   length String?
-  sleaves Int?
+  sleaves String?
   product Product? @relation(fields: [product_id], references:[id])
   product_id String?
 colors Color[]

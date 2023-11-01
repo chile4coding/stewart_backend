@@ -74,6 +74,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
       productId,
       salesPrice,
       image_url,
+      short_desc,
     } = req.body;
 
     const authId = req.authId;
@@ -118,6 +119,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
           data: {
             name: name,
             price: pr,
+            short_desc:short_desc,
             initial_color: initialColor,
             initial_size: initialSize,
             description: description,
@@ -140,6 +142,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
             name: name,
             price: Number(Number(price).toFixed(2)),
             initial_color: initialColor,
+            short_desc:short_desc,
             initial_size: initialSize,
             description: description,
             categoryName: productCategory?.name,

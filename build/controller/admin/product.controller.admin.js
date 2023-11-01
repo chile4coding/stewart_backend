@@ -68,7 +68,7 @@ exports.createCategory = (0, express_async_handler_1.default)((req, res, next) =
     }
 }));
 exports.createOrUpdateProduct = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { categoryId, name, price, discount, initialSize, initialColor, description, productId, salesPrice, image_url, } = req.body;
+    const { categoryId, name, price, discount, initialSize, initialColor, description, productId, salesPrice, image_url, short_desc, } = req.body;
     const authId = req.authId;
     try {
         const subscriberPrice = Number((price - Number(price) * (Number(discount) / 100)).toFixed(2));
@@ -102,6 +102,7 @@ exports.createOrUpdateProduct = (0, express_async_handler_1.default)((req, res, 
                 data: {
                     name: name,
                     price: pr,
+                    short_desc: short_desc,
                     initial_color: initialColor,
                     initial_size: initialSize,
                     description: description,
@@ -125,6 +126,7 @@ exports.createOrUpdateProduct = (0, express_async_handler_1.default)((req, res, 
                     name: name,
                     price: Number(Number(price).toFixed(2)),
                     initial_color: initialColor,
+                    short_desc: short_desc,
                     initial_size: initialSize,
                     description: description,
                     categoryName: productCategory === null || productCategory === void 0 ? void 0 : productCategory.name,
@@ -163,9 +165,9 @@ exports.createOrUpdateSize = (0, express_async_handler_1.default)((req, res, nex
         const size = yield prisma_client_1.default.size.create({
             data: {
                 name: name,
-                waist: Number(waist),
-                length: Number(length),
-                sleaves: Number(sleaves),
+                waist: waist,
+                length: length,
+                sleaves: sleaves,
                 product: { connect: { id: productId } },
             },
         });

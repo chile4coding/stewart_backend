@@ -42,8 +42,8 @@ reviews Review[]
 model Size{
   id  String @id @default(uuid())
   name String
-  waist Int?
-  length Int?
+  waist String?
+  length String?
   sleaves Int?
   product Product? @relation(fields: [product_id], references:[id])
   product_id String?

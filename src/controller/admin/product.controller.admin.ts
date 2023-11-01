@@ -186,9 +186,9 @@ export const createOrUpdateSize = expressAsyncHandler(
       const size = await prisma.size.create({
         data: {
           name: name,
-          waist: Number(waist),
-          length: Number(length),
-          sleaves: Number(sleaves),
+          waist: waist,
+          length:length,
+          sleaves: sleaves,
           product: { connect: { id: productId } },
         },
       });

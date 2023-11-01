@@ -183,15 +183,13 @@ export const createOrUpdateSize = expressAsyncHandler(
         throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
       }
 
-    
-
       const size = await prisma.size.create({
         data: {
           name: name,
-          waist : Number(waist),
+          waist: Number(waist),
           length: Number(length),
           sleaves: Number(sleaves),
-          product:{connect:{id:productId}}
+          product: { connect: { id: productId } },
         },
       });
       res.status(StatusCodes.CREATED).json({

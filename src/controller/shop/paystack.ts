@@ -21,6 +21,7 @@ export const paystack = expressAsyncHandler(async (req, res, next) => {
     city,
     address,
     country,
+    shipping,
     phone,
   } = req.body;
   const https = require("https");
@@ -58,8 +59,8 @@ export const paystack = expressAsyncHandler(async (req, res, next) => {
               refNo: reference,
               orderitem: JSON.stringify(order),
               total: amount,
-              tax: 4,
-              shipping: 50,
+              tax: 0,
+              shipping,
               phone,
               city,
               address,
@@ -76,8 +77,8 @@ export const paystack = expressAsyncHandler(async (req, res, next) => {
               refNo: reference,
               orderitem: order,
               total: Number(amount),
-              tax: 4.0,
-              shipping: 50.0,
+              tax: 0,
+              shipping,
               phone,
               city,
               address,
@@ -107,16 +108,14 @@ export const paystack = expressAsyncHandler(async (req, res, next) => {
 
 export const verifyPayment = expressAsyncHandler(async (req, res, next) => {
   const reference = req.query.reference;
-
   const https = require("https");
-
   const options = {
-    hostname: "api.paystack.co",
-    port: 443,
+    hostname: process.env.paystackHostname,
+    port: process.env.paystackPort,
     path: `/transaction/verify/:${reference}`,
     method: "GET",
     headers: {
-      Authorization: "Bearer SECRET_KEY",
+      Authorization: process.env.paystackAuthization,
     },
   };
 

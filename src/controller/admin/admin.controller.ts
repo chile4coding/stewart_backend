@@ -72,7 +72,7 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
     }
     await comparePassword(password, findAdmin?.password as string);
     const token = JWTToken(
-      findAdmin?.email as string, 
+      findAdmin?.email as string,
       findAdmin?.id as string,
       findAdmin?.password as string
     );
@@ -80,7 +80,7 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
       message: "Welcome to sStewart Collections",
       token,
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 });

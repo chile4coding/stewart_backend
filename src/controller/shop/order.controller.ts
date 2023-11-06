@@ -57,7 +57,7 @@ export const visitorCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-      if (visitorOrder.status !== "success") {
+      if (visitorOrder.status !== "SUCCESS") {
         res.status(StatusCodes.BAD_REQUEST).json({
           message: "Your Order was not successful",
         });
@@ -129,6 +129,12 @@ export const registeredUserCreateOrder = expressAsyncHandler(
       <a href="https://stewart-frontend-chile4coding.vercel.app/"   >Click to track your order</a>
       `;
       const subject = "Your Order Status";
+
+        if (visitorOrder.status !== "SUCCESS") {
+          res.status(StatusCodes.BAD_REQUEST).json({
+            message: "Your Order was not successful",
+          });
+        }
 
       const mail = await sendEmail(
         content,

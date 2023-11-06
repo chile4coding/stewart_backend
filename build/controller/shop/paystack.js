@@ -25,7 +25,7 @@ exports.paystack = (0, express_async_handler_1.default)((req, res, next) => __aw
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Inavlid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
-    const { email, amount, userId, order, name, state, city, address, country, phone, } = req.body;
+    const { email, amount, userId, order, name, state, city, address, country, shipping, phone, } = req.body;
     const https = require("https");
     const params = JSON.stringify({
         email: email,
@@ -57,8 +57,8 @@ exports.paystack = (0, express_async_handler_1.default)((req, res, next) => __aw
                         refNo: reference,
                         orderitem: JSON.stringify(order),
                         total: amount,
-                        tax: 4,
-                        shipping: 50,
+                        tax: 0,
+                        shipping,
                         phone,
                         city,
                         address,
@@ -76,8 +76,8 @@ exports.paystack = (0, express_async_handler_1.default)((req, res, next) => __aw
                         refNo: reference,
                         orderitem: order,
                         total: Number(amount),
-                        tax: 4.0,
-                        shipping: 50.0,
+                        tax: 0,
+                        shipping,
                         phone,
                         city,
                         address,
@@ -106,12 +106,12 @@ exports.verifyPayment = (0, express_async_handler_1.default)((req, res, next) =>
     const reference = req.query.reference;
     const https = require("https");
     const options = {
-        hostname: "api.paystack.co",
-        port: 443,
+        hostname: process.env.paystackHostname,
+        port: process.env.paystackPort,
         path: `/transaction/verify/:${reference}`,
         method: "GET",
         headers: {
-            Authorization: "Bearer SECRET_KEY",
+            Authorization: process.env.paystackAuthization,
         },
     };
     https

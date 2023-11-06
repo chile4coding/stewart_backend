@@ -121,7 +121,9 @@ model Order {
   id      String   @id @default(uuid())
   status  Status   @default(pending)
   name String?
+  email String?
   state String?
+  shippingType ShippingType @default(standard)
   city String?
   address String?
   country String?
@@ -145,8 +147,13 @@ model SaveItem{
 }
 
 
+enum ShippingType{
+standard
+express
+}
 enum Status{
   pending
+  failed
   success
   cancelled
 }

@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadImage = exports.isPrismaError = exports.comparePassword = exports.JWTToken = exports.hashPassword = exports.salt = exports.throwError = void 0;
+exports.sendEmail = exports.uploadImage = exports.isPrismaError = exports.comparePassword = exports.JWTToken = exports.hashPassword = exports.salt = exports.throwError = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cloudinary_1 = require("cloudinary");
+const nodemailer_1 = require("nodemailer");
 dotenv_1.default.config();
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_codes_1 = require("http-status-codes");
@@ -70,3 +71,28 @@ const uploadImage = function name(file) {
     });
 };
 exports.uploadImage = uploadImage;
+const sendEmail = function (content, to, subject) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const mailOption = {
+            from: process.env.EMAIL,
+            to: to,
+            subject: subject,
+            html: content,
+        };
+        try {
+            const transport = (0, nodemailer_1.createTransport)({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL,
+                    pass: process.env.GMAIL_PASSWORD,
+                },
+            });
+            const info = yield transport.sendMail(mailOption);
+            return info;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    });
+};
+exports.sendEmail = sendEmail;

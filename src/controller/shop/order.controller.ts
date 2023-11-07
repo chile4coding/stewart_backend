@@ -57,25 +57,25 @@ export const visitorCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-      if (
-        visitorOrder.status !== "SUCCESS" || "PAY ON DELIVERY"
-      ) {
-        res.status(StatusCodes.BAD_REQUEST).json({
-          message: "Your Order was not successful",
-        });
-      }
-
+    if (
+      visitorOrder.status === "SUCCESS" ||
+      visitorOrder.status === "PAY ON DELIVERY"
+    ) {
       const mail = await sendEmail(
         content,
         visitorOrder?.email as string,
         subject
       );
 
-      console.log(mail);
       res.status(StatusCodes.OK).json({
         message: "Order placed successfully",
         visitorOrder,
       });
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Your Order was not successful",
+      });
+    }
     } catch (error) {
       next(error);
     }
@@ -132,24 +132,28 @@ export const registeredUserCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-        if (visitorOrder.status !== "SUCCESS" || "PAY ON DELIVERY") {
-          res.status(StatusCodes.BAD_REQUEST).json({
-            message: "Your Order was not successful",
-          });
+        if (
+         visitorOrder.status === "SUCCESS" ||  visitorOrder.status === "PAY ON DELIVERY"
+        ) {
+            const mail = await sendEmail(
+              content,
+              visitorOrder?.email as string,
+              subject
+            );
+
+            res.status(StatusCodes.OK).json({
+              message: "Order placed successfully",
+              visitorOrder,
+            });
+       
+        }else{
+             res.status(StatusCodes.BAD_REQUEST).json({
+               message: "Your Order was not successful",
+             });
+
         }
 
-      const mail = await sendEmail(
-        content,
-        visitorOrder?.email as string,
-        subject
-      );
-
-      console.log(mail);
-
-      res.status(StatusCodes.OK).json({
-        message: "Order placed successfully",
-        visitorOrder,
-      });
+    
     } catch (error) {
       next(error);
     }

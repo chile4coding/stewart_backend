@@ -57,7 +57,9 @@ export const visitorCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-      if (visitorOrder.status !== "SUCCESS") {
+      if (
+        visitorOrder.status !== "SUCCESS" || "PAY ON DELIVERY"
+      ) {
         res.status(StatusCodes.BAD_REQUEST).json({
           message: "Your Order was not successful",
         });
@@ -130,7 +132,7 @@ export const registeredUserCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-        if (visitorOrder.status !== "SUCCESS") {
+        if (visitorOrder.status !== "SUCCESS" || "PAY ON DELIVERY") {
           res.status(StatusCodes.BAD_REQUEST).json({
             message: "Your Order was not successful",
           });

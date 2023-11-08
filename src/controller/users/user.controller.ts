@@ -130,6 +130,7 @@ export const requestOtp = expressAsyncHandler(async (req, res, next) => {
       data: {
         otp_secret: secret.base32 as string,
         otp_trial: token,
+        verify_otp: false,
       },
     });
 
@@ -165,6 +166,10 @@ export const resetPassword = expressAsyncHandler(async (req, res, next) => {
       throwError("user not found", StatusCodes.BAD_REQUEST, true);
     }
 
+    if (!findUser?.verify_otp) {
+      throwError("OTP not verified, verify OTP", StatusCodes.BAD_REQUEST, true);
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const reset = await prisma.user.update({
@@ -197,9 +202,14 @@ export const loginUser = expressAsyncHandler(async (req, res, next) => {
     const findUser = await prisma.user.findUnique({
       where: {
         email: email,
-        
       },
-      include:{wallet:true, orders:true, review:true, inbox:true, save_items:true}
+      include: {
+        wallet: true,
+        orders: true,
+        review: true,
+        inbox: true,
+        save_items: true,
+      },
     });
 
     if (!findUser) {
@@ -228,9 +238,6 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
   if (!errors.isEmpty()) {
     throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
   }
-
-
- 
 
   try {
     const { password, email, name, phone, country, state, city, address } =
@@ -267,7 +274,7 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
     res.status(StatusCodes.OK).json({
       message: "Welcome to Stewart Collections",
 
-     updateUser
+      updateUser,
     });
   } catch (error) {
     next(error);

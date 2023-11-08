@@ -47,6 +47,7 @@ router.post(
 );
 router.post(
   "/pay_with_wallet",
+  auth,
   [
     body("email").notEmpty(),
     body("total").notEmpty(),

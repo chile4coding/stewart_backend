@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendEmail = exports.uploadImage = exports.isPrismaError = exports.comparePassword = exports.JWTToken = exports.hashPassword = exports.salt = exports.throwError = void 0;
+exports.verifyTwoFactorAuth = exports.reqTwoFactorAuth = exports.sendEmail = exports.uploadImage = exports.isPrismaError = exports.comparePassword = exports.JWTToken = exports.hashPassword = exports.salt = exports.throwError = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cloudinary_1 = require("cloudinary");
@@ -21,6 +21,7 @@ dotenv_1.default.config();
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_codes_1 = require("http-status-codes");
 const client_1 = require("@prisma/client");
+const speakeasy_1 = __importDefault(require("speakeasy"));
 const throwError = (errorMsg, statusCode, validationError) => {
     const error = new Error(errorMsg);
     error.statusCode = statusCode;
@@ -96,3 +97,28 @@ const sendEmail = function (content, to, subject) {
     });
 };
 exports.sendEmail = sendEmail;
+function reqTwoFactorAuth() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const secret = speakeasy_1.default.generateSecret({ length: 10 });
+        const token = speakeasy_1.default.totp({
+            secret: secret.base32,
+            encoding: "base32",
+            step: 240
+        });
+        return { token, secret };
+    });
+}
+exports.reqTwoFactorAuth = reqTwoFactorAuth;
+function verifyTwoFactorAuth(token, secret) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const isValid = speakeasy_1.default.totp.verify({
+            secret: secret,
+            encoding: "base32",
+            token: token,
+            step: 240,
+            window: 2,
+        });
+        return isValid;
+    });
+}
+exports.verifyTwoFactorAuth = verifyTwoFactorAuth;

@@ -15,10 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_client_1 = __importDefault(require("./configuration/prisma-client"));
-const errorhandler_1 = __importDefault(require("./middleware/errorhandler"));
 // import requestHeaders from "./middleware/requestHeader";
 const body_parser_1 = __importDefault(require("body-parser"));
-const cloudinary_1 = require("cloudinary");
+const morgan_1 = __importDefault(require("morgan"));
+// import errorHandler from "errorhandler";
+const errorhandler_1 = __importDefault(require("./middleware/errorhandler"));
 const cors_1 = __importDefault(require("cors"));
 const route_1 = __importDefault(require("./route/route"));
 dotenv_1.default.config();
@@ -26,17 +27,13 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: "*",
 }));
-cloudinary_1.v2.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use((0, morgan_1.default)("dev"));
 // app.use(cors({ credentials: true, origin: "*" }));
 // app.use(requestHeaders)
-app.use(errorhandler_1.default);
 app.use(route_1.default);
+app.use(errorhandler_1.default);
 class CreateDBConnect {
     constructor() {
         this.db = prisma_client_1.default;

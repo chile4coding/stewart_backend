@@ -71,7 +71,7 @@ exports.loginAdmin = (0, express_async_handler_1.default)((req, res, next) => __
         yield (0, helpers_1.comparePassword)(password, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.password);
         const token = (0, helpers_1.JWTToken)(findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.email, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.id, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.password);
         res.status(http_status_codes_1.StatusCodes.OK).json({
-            message: "Welcome to sStewart Collections",
+            message: "Welcome to Stewart Collections",
             token,
         });
     }

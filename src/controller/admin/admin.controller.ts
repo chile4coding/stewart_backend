@@ -77,7 +77,7 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
       findAdmin?.password as string
     );
     res.status(StatusCodes.OK).json({
-      message: "Welcome to sStewart Collections",
+      message: "Welcome to Stewart Collections",
       token,
     });
   } catch (error) {

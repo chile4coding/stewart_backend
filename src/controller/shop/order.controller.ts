@@ -57,25 +57,25 @@ export const visitorCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-    if (
-      visitorOrder.status === "SUCCESS" ||
-      visitorOrder.status === "PAY ON DELIVERY"
-    ) {
-      const mail = await sendEmail(
-        content,
-        visitorOrder?.email as string,
-        subject
-      );
+      if (
+        visitorOrder.status === "SUCCESS" ||
+        visitorOrder.status === "PAY ON DELIVERY"
+      ) {
+        const mail = await sendEmail(
+          content,
+          visitorOrder?.email as string,
+          subject
+        );
 
-      res.status(StatusCodes.OK).json({
-        message: "Order placed successfully",
-        visitorOrder,
-      });
-    } else {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Your Order was not successful",
-      });
-    }
+        res.status(StatusCodes.OK).json({
+          message: "Order placed successfully",
+          visitorOrder,
+        });
+      } else {
+        res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Your Order was not successful",
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -132,28 +132,25 @@ export const registeredUserCreateOrder = expressAsyncHandler(
       `;
       const subject = "Your Order Status";
 
-        if (
-         visitorOrder.status === "SUCCESS" ||  visitorOrder.status === "PAY ON DELIVERY"
-        ) {
-            const mail = await sendEmail(
-              content,
-              visitorOrder?.email as string,
-              subject
-            );
+      if (
+        visitorOrder.status === "SUCCESS" ||
+        visitorOrder.status === "PAY ON DELIVERY"
+      ) {
+        const mail = await sendEmail(
+          content,
+          visitorOrder?.email as string,
+          subject
+        );
 
-            res.status(StatusCodes.OK).json({
-              message: "Order placed successfully",
-              visitorOrder,
-            });
-       
-        }else{
-             res.status(StatusCodes.BAD_REQUEST).json({
-               message: "Your Order was not successful",
-             });
-
-        }
-
-    
+        res.status(StatusCodes.OK).json({
+          message: "Order placed successfully",
+          visitorOrder,
+        });
+      } else {
+        res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Your Order was not successful",
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -208,6 +205,92 @@ export const getUserOrder = expressAsyncHandler(
       res
         .status(StatusCodes.OK)
         .json({ message: "Order has been fetched successfully", order });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+export const payOrderWithWallet = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const errors = validationResult(req.body);
+
+    if (!errors.isEmpty()) {
+      throwError("Invalid Input", StatusCodes.BAD_REQUEST, true);
+    }
+    const { authId } = req;
+
+
+    const {
+      email,
+      total,
+      orderitem,
+      name,
+      state,
+      city,
+      address,
+      country,
+      status,
+      shipping,
+      phone,
+      shippingType,
+    } = req.body;
+    try {
+      const userWallet = await prisma.wallet.findUnique({
+        where: { user_id: authId },
+      });
+
+      if (!userWallet) {
+        throwError("Invalid user", StatusCodes.BAD_REQUEST, true);
+      }
+
+      const availableAmount = Number(userWallet?.amount);
+
+      if (availableAmount < 500) {
+        throwError(
+          "Insufficient wallet balance, fund your wallet",
+          StatusCodes.BAD_REQUEST,
+          true
+        );
+      }
+      if (availableAmount < Number(total)) {
+        throwError(
+          "Insufficient wallet balance, fund your wallet",
+          StatusCodes.BAD_REQUEST,
+          true
+        );
+      }
+
+      const order = await prisma.order.create({
+        data: {
+          email,
+          total,
+          orderitem,
+          name,
+          state,
+          city,
+          address,
+          country,
+          status,
+          shipping,
+          phone,
+          shippingType,
+          refNo: authId,
+          user: { connect: { id: authId } },
+        },
+      });
+
+      const updateWallet = await prisma.wallet.update({
+        where: { id: userWallet?.id },
+        data: {
+          amount: availableAmount - Number(total),
+        },
+      });
+
+      console.log(updateWallet)
+
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Order successfully placed", order });
     } catch (error) {
       next(error);
     }

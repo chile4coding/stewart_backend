@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserOrder = exports.getAllOrder = exports.getOrder = exports.registeredUserCreateOrder = exports.visitorCreateOrder = void 0;
+exports.payOrderWithWallet = exports.getUserOrder = exports.getAllOrder = exports.getOrder = exports.registeredUserCreateOrder = exports.visitorCreateOrder = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
+const express_validator_1 = require("express-validator");
 dotenv_1.default.config();
 exports.visitorCreateOrder = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, total, orderitem, name, state, city, address, status, country, shipping, phone, shippingType, refNo, } = req.body;
@@ -48,17 +49,19 @@ exports.visitorCreateOrder = (0, express_async_handler_1.default)((req, res, nex
       <a href="https://stewart-frontend-chile4coding.vercel.app/"   >Click to track your order</a>
       `;
         const subject = "Your Order Status";
-        if (visitorOrder.status !== "success") {
+        if (visitorOrder.status === "SUCCESS" ||
+            visitorOrder.status === "PAY ON DELIVERY") {
+            const mail = yield (0, helpers_1.sendEmail)(content, visitorOrder === null || visitorOrder === void 0 ? void 0 : visitorOrder.email, subject);
+            res.status(http_status_codes_1.StatusCodes.OK).json({
+                message: "Order placed successfully",
+                visitorOrder,
+            });
+        }
+        else {
             res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                 message: "Your Order was not successful",
             });
         }
-        const mail = yield (0, helpers_1.sendEmail)(content, visitorOrder === null || visitorOrder === void 0 ? void 0 : visitorOrder.email, subject);
-        console.log(mail);
-        res.status(http_status_codes_1.StatusCodes.OK).json({
-            message: "Order placed successfully",
-            visitorOrder,
-        });
     }
     catch (error) {
         next(error);
@@ -95,12 +98,19 @@ exports.registeredUserCreateOrder = (0, express_async_handler_1.default)((req, r
       <a href="https://stewart-frontend-chile4coding.vercel.app/"   >Click to track your order</a>
       `;
         const subject = "Your Order Status";
-        const mail = yield (0, helpers_1.sendEmail)(content, visitorOrder === null || visitorOrder === void 0 ? void 0 : visitorOrder.email, subject);
-        console.log(mail);
-        res.status(http_status_codes_1.StatusCodes.OK).json({
-            message: "Order placed successfully",
-            visitorOrder,
-        });
+        if (visitorOrder.status === "SUCCESS" ||
+            visitorOrder.status === "PAY ON DELIVERY") {
+            const mail = yield (0, helpers_1.sendEmail)(content, visitorOrder === null || visitorOrder === void 0 ? void 0 : visitorOrder.email, subject);
+            res.status(http_status_codes_1.StatusCodes.OK).json({
+                message: "Order placed successfully",
+                visitorOrder,
+            });
+        }
+        else {
+            res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                message: "Your Order was not successful",
+            });
+        }
     }
     catch (error) {
         next(error);
@@ -147,6 +157,60 @@ exports.getUserOrder = (0, express_async_handler_1.default)((req, res, next) => 
         res
             .status(http_status_codes_1.StatusCodes.OK)
             .json({ message: "Order has been fetched successfully", order });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = (0, express_validator_1.validationResult)(req.body);
+    if (!errors.isEmpty()) {
+        (0, helpers_1.throwError)("Invalid Input", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+    }
+    const { authId } = req;
+    const { email, total, orderitem, name, state, city, address, country, status, shipping, phone, shippingType, } = req.body;
+    try {
+        const userWallet = yield prisma_client_1.default.wallet.findUnique({
+            where: { user_id: authId },
+        });
+        if (!userWallet) {
+            (0, helpers_1.throwError)("Invalid user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const availableAmount = Number(userWallet === null || userWallet === void 0 ? void 0 : userWallet.amount);
+        if (availableAmount < 500) {
+            (0, helpers_1.throwError)("Insufficient wallet balance, fund your wallet", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        if (availableAmount < Number(total)) {
+            (0, helpers_1.throwError)("Insufficient wallet balance, fund your wallet", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const order = yield prisma_client_1.default.order.create({
+            data: {
+                email,
+                total,
+                orderitem,
+                name,
+                state,
+                city,
+                address,
+                country,
+                status,
+                shipping,
+                phone,
+                shippingType,
+                refNo: authId,
+                user: { connect: { id: authId } },
+            },
+        });
+        const updateWallet = yield prisma_client_1.default.wallet.update({
+            where: { id: userWallet === null || userWallet === void 0 ? void 0 : userWallet.id },
+            data: {
+                amount: availableAmount - Number(total),
+            },
+        });
+        console.log(updateWallet);
+        res
+            .status(http_status_codes_1.StatusCodes.OK)
+            .json({ message: "Order successfully placed", order });
     }
     catch (error) {
         next(error);

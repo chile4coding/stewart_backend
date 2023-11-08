@@ -6,14 +6,8 @@ const helpers_1 = require("../helpers");
 const errorHandler = (error, req, res, next) => {
     const message = error.message;
     const status = error.statusCode || 500;
-    console.log("Error Message", message);
     const errors = (0, express_validator_1.validationResult)(req);
-    if (error.validationError) {
-        return res
-            .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
-            .json({ errors: errors === null || errors === void 0 ? void 0 : errors.array(), message: "Validation error" });
-    }
-    else if ((0, helpers_1.isPrismaError)(error)) {
+    if ((0, helpers_1.isPrismaError)(error)) {
         return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
             message: "Internal server error",
             error: error.message,
@@ -25,6 +19,7 @@ const errorHandler = (error, req, res, next) => {
             message: message,
             error: "Error message",
             errorStatus: status,
+            path: req.path
         });
     }
     next();

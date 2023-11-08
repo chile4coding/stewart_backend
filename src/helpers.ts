@@ -3,12 +3,14 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 import { createTransport } from "nodemailer";
+
 dotenv.config();
 
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { Prisma } from "@prisma/client";
 import { error } from "console";
+import Speakeasy  from  "speakeasy"
 
 export interface requestError {
   status?: number;
@@ -113,3 +115,32 @@ export const sendEmail = async function (
     console.log(error);
   }
 };
+
+
+export async function reqTwoFactorAuth() {
+
+  const secret = Speakeasy.generateSecret({ length: 10 });
+
+  
+  const token = Speakeasy.totp({
+    secret: secret.base32,
+    encoding: "base32",
+    step: 240
+  });
+
+  return { token, secret };
+}
+
+
+
+export async function verifyTwoFactorAuth(token: string, secret: string) {
+  const isValid = Speakeasy.totp.verify({
+    secret: secret,
+    encoding: "base32",
+    token: token,
+    step: 240,
+    window: 2,
+  });
+  return isValid;
+}
+

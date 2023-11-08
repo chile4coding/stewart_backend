@@ -12,13 +12,11 @@ const errorHandler = (
 ) => {
   const message = error.message ;
   const status = error.statusCode || 500;
-  console.log("Error Message", message);
   const errors = validationResult(req);
-  if (error.validationError) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ errors: errors?.array(), message: "Validation error" });
-  } else if (isPrismaError(error)) {
+
+
+
+  if (isPrismaError(error)) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Internal server error",
       error: error.message,
@@ -29,9 +27,10 @@ const errorHandler = (
       message: message,
       error: "Error message",
       errorStatus: status,
+      path:req.path
     });
   }
-  next();
+  next()
 };
 
 export default errorHandler;

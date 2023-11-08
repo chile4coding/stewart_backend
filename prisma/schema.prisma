@@ -72,6 +72,10 @@ name String
   email String @unique
   gender String?
   phone String?
+  otp String?  @unique
+  verify_otp Boolean
+  otp_secret String
+  otp_trial String @unique
   passwords String
   dob String
   city String?

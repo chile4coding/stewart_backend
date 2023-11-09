@@ -314,3 +314,35 @@ export const fundWallet = expressAsyncHandler(
     }
   }
 );
+export const getUser = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const errors = validationResult(req.body);
+
+    if (!errors.isEmpty()) {
+      throwError("Invalid Input", StatusCodes.BAD_REQUEST, true);
+    }
+    const authId = req.authId;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: authId },
+        include: {
+          wallet: true,
+          orders: true,
+          review: true,
+          inbox: true,
+          save_items: true,
+        },
+      });
+      if (!user) {
+        throwError("User not found", StatusCodes.BAD_REQUEST, true);
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: "user logged in successfully",
+        user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);

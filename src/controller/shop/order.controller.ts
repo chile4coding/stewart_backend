@@ -259,6 +259,12 @@ export const payOrderWithWallet = expressAsyncHandler(
           true
         );
       }
+         const currentDate = new Date();
+
+         const arrivalDate =
+           shippingType === "express"
+             ? currentDate.setDate(currentDate.getDate() + 4)
+             : currentDate.setDate(currentDate.getDate() + 7);
 
       const order = await prisma.order.create({
         data: {
@@ -275,22 +281,42 @@ export const payOrderWithWallet = expressAsyncHandler(
           phone,
           shippingType,
           refNo: authId,
+          arrivalDate: currentDate + "",
           user: { connect: { id: authId } },
         },
       });
 
+      const remainingAmount = availableAmount - Number(total)
+
       const updateWallet = await prisma.wallet.update({
         where: { id: userWallet?.id },
         data: {
-          amount: availableAmount - Number(total),
+          amount:remainingAmount ,
         },
       });
 
-      console.log(updateWallet)
 
-      res
-        .status(StatusCodes.OK)
-        .json({ message: "Order successfully placed", order });
+      const content = `<p> Your order has been  received please. </p> <p> Track your order with the id</p>  <p> Tracking id:  <h2> ${order.id}  </h2> </p>   <br> <p>Enter the your tracking Id  to the link you clicked on below  </p> <br> 
+      <a href="https://stewart-frontend-chile4coding.vercel.app/"   >Click to track your order</a>
+      `;
+      const subject = "Your Order Status";
+
+      if (order.status === "SUCCESS" || order.status === "PAY ON DELIVERY"
+      ){
+         const mail = await sendEmail(
+           content,
+           order?.email as string,
+           subject
+         );
+          res
+            .status(StatusCodes.OK)
+            .json({ message: "Order successfully placed", order });
+      }else{
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Your Order was not successful",
+    });
+      }
+       
     } catch (error) {
       next(error);
     }

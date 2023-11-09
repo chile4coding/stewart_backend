@@ -4,6 +4,7 @@ import auth from "../middleware/auth";
 import {
   createUser,
   fundWallet,
+  getUser,
   loginUser,
   requestOtp,
   resetPassword,
@@ -62,5 +63,10 @@ router.post(
     body("shippingType").notEmpty(),
   ],
   payOrderWithWallet
+);
+router.get(
+  "/get_user",
+  auth,
+  getUser
 );
 export const userRouter = router;

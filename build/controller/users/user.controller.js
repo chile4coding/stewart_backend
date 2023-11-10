@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fundWallet = exports.updateProfile = exports.loginUser = exports.resetPassword = exports.requestOtp = exports.verifyOtp = exports.createUser = void 0;
+exports.getUser = exports.fundWallet = exports.updateProfile = exports.loginUser = exports.resetPassword = exports.requestOtp = exports.verifyOtp = exports.createUser = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const express_validator_1 = require("express-validator");
 const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
+const node_cron_1 = __importDefault(require("node-cron"));
 exports.createUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
@@ -117,6 +118,7 @@ exports.requestOtp = (0, express_async_handler_1.default)((req, res, next) => __
             data: {
                 otp_secret: secret.base32,
                 otp_trial: token,
+                verify_otp: false,
             },
         });
         if (!userOtpupdate) {
@@ -144,6 +146,9 @@ exports.resetPassword = (0, express_async_handler_1.default)((req, res, next) =>
         const findUser = yield prisma_client_1.default.user.findUnique({ where: { email: email } });
         if (!findUser) {
             (0, helpers_1.throwError)("user not found", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        if (!(findUser === null || findUser === void 0 ? void 0 : findUser.verify_otp)) {
+            (0, helpers_1.throwError)("OTP not verified, verify OTP", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
         const hashedPassword = yield (0, helpers_1.hashPassword)(password);
         const reset = yield prisma_client_1.default.user.update({
@@ -173,7 +178,13 @@ exports.loginUser = (0, express_async_handler_1.default)((req, res, next) => __a
             where: {
                 email: email,
             },
-            include: { wallet: true, orders: true, review: true, inbox: true, save_items: true }
+            include: {
+                wallet: true,
+                orders: true,
+                review: true,
+                inbox: true,
+                save_items: true,
+            },
         });
         if (!findUser) {
             (0, helpers_1.throwError)("User not registered", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
@@ -223,7 +234,7 @@ exports.updateProfile = (0, express_async_handler_1.default)((req, res, next) =>
         }
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Welcome to Stewart Collections",
-            updateUser
+            updateUser,
         });
     }
     catch (error) {
@@ -260,4 +271,36 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
     catch (error) {
         next(error);
     }
+}));
+exports.getUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = (0, express_validator_1.validationResult)(req.body);
+    if (!errors.isEmpty()) {
+        (0, helpers_1.throwError)("Invalid Input", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+    }
+    const authId = req.authId;
+    try {
+        const user = yield prisma_client_1.default.user.findUnique({
+            where: { id: authId },
+            include: {
+                wallet: true,
+                orders: true,
+                review: true,
+                inbox: true,
+                save_items: true,
+            },
+        });
+        if (!user) {
+            (0, helpers_1.throwError)("User not found", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "user logged in successfully",
+            user,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+node_cron_1.default.schedule(' 1 * *  * * * ', () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("hello this is nice");
 }));

@@ -102,14 +102,21 @@ export const sendEmail = async function (
 
   try {
     const transport = createTransport({
-      service: "gmail",
+      host: "mail.privateemail.com", // Example: 'smtp.yourprovider.com'
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.GMAIL_PASSWORD,
+        pass: process.env.MAIL_PASSWORD,
+      },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
       },
     });
    
     const info = await transport.sendMail(mailOption);
+  
     return info;
   } catch (error) {
     console.log(error);

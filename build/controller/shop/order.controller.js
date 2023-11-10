@@ -183,6 +183,10 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
         if (availableAmount < Number(total)) {
             (0, helpers_1.throwError)("Insufficient wallet balance, fund your wallet", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
+        const currentDate = new Date();
+        const arrivalDate = shippingType === "express"
+            ? currentDate.setDate(currentDate.getDate() + 4)
+            : currentDate.setDate(currentDate.getDate() + 7);
         const order = yield prisma_client_1.default.order.create({
             data: {
                 email,
@@ -198,19 +202,32 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
                 phone,
                 shippingType,
                 refNo: authId,
+                arrivalDate: currentDate + "",
                 user: { connect: { id: authId } },
             },
         });
+        const remainingAmount = availableAmount - Number(total);
         const updateWallet = yield prisma_client_1.default.wallet.update({
             where: { id: userWallet === null || userWallet === void 0 ? void 0 : userWallet.id },
             data: {
-                amount: availableAmount - Number(total),
+                amount: remainingAmount,
             },
         });
-        console.log(updateWallet);
-        res
-            .status(http_status_codes_1.StatusCodes.OK)
-            .json({ message: "Order successfully placed", order });
+        const content = `<p> Your order has been  received please. </p> <p> Track your order with the id</p>  <p> Tracking id:  <h2> ${order.id}  </h2> </p>   <br> <p>Enter the your tracking Id  to the link you clicked on below  </p> <br> 
+      <a href="https://stewart-frontend-chile4coding.vercel.app/"   >Click to track your order</a>
+      `;
+        const subject = "Your Order Status";
+        if (order.status === "SUCCESS" || order.status === "PAY ON DELIVERY") {
+            const mail = yield (0, helpers_1.sendEmail)(content, order === null || order === void 0 ? void 0 : order.email, subject);
+            res
+                .status(http_status_codes_1.StatusCodes.OK)
+                .json({ message: "Order successfully placed", order });
+        }
+        else {
+            res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                message: "Your Order was not successful",
+            });
+        }
     }
     catch (error) {
         next(error);

@@ -1,158 +1,188 @@
 import expressAsyncHandler from "express-async-handler";
+import Paystack from "paystack";
 import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import { throwError } from "../../helpers";
 import dotenv from "dotenv";
 import prisma from "../../configuration/prisma-client";
+const paystack = Paystack(process.env.paystackAuthization as string);
 dotenv.config();
 
-export const paystack = expressAsyncHandler(async (req, res, next) => {
-  const errors = validationResult(req.body);
-  if (!errors.isEmpty()) {
-    throwError("Inavlid inputs", StatusCodes.BAD_REQUEST, true);
-  }
-  const {
-    email,
-    amount,
-    userId,
-    order,
-    name,
-    state,
-    city,
-    address,
-    country,
-    shipping,
-    phone,
-  } = req.body;
-  const https = require("https");
-  const params = JSON.stringify({
-    email: email,
-    amount: `${Number(amount) * 100}`,
-  });
+// export const paystack = expressAsyncHandler(async (req, res, next) => {
+//   const errors = validationResult(req.body);
+//   if (!errors.isEmpty()) {
+//     throwError("Inavlid inputs", StatusCodes.BAD_REQUEST, true);
+//   }
+//   const {
+//     email,
+//     amount,
+//     userId,
+//     order,
+//     name,
+//     state,
+//     city,
+//     address,
+//     country,
+//     shipping,
+//     phone,
+//   } = req.body;
+//   const https = require("https");
+//   const params = JSON.stringify({
+//     email: email,
+//     amount: `${Number(amount) * 100}`,
+//   });
 
-  const options = {
-    hostname: process.env.paystackHostname,
-    port: process.env.paystackPort,
-    path: process.env.paystackPath,
-    method: process.env.paystackMethod,
-    headers: {
-      Authorization: process.env.paystackAuthization,
-      "Content-Type": "application/json",
-    },
-  };
-  const reqPaystack = https
-    .request(options, (resPaystack: any) => {
-      let data = "";
+//   const options = {
+//     hostname: process.env.paystackHostname,
+//     port: process.env.paystackPort,
+//     path: process.env.paystackPath,
+//     method: process.env.paystackMethod,
+//     headers: {
+//       Authorization: process.env.paystackAuthization,
+//       "Content-Type": "application/json",
+//     },
+//   };
+//   const reqPaystack = https
+//     .request(options, (resPaystack: any) => {
+//       let data = "";
 
-      resPaystack.on("data", (chunk: any) => {
-        data += chunk;
-      });
+//       resPaystack.on("data", (chunk: any) => {
+//         data += chunk;
+//       });
 
-      resPaystack.on("end", async () => {
-        const finalData = JSON.parse(data);
-        const { authorization_url, reference } = finalData.data;
-        let newOrder;
+//       resPaystack.on("end", async () => {
+//         const finalData = JSON.parse(data);
+//         const { authorization_url, reference } = finalData.data;
+//         let newOrder;
 
-        if (Boolean(userId)) {
-          newOrder = await prisma.order.create({
-            data: {
-              refNo: reference,
-              orderitem: JSON.stringify(order),
-              total: amount,
-              tax: 0,
-              shipping,
-              phone,
-              city,
-              address,
-              country,
-              name,
-              state,
-              arrivalDate: `${new Date().getDate() + 4}`,
-              user: { connect: { id: userId } },
-            },
-          });
-        } else {
-          newOrder = await prisma.order.create({
-            data: {
-              refNo: reference,
-              orderitem: order,
-              total: Number(amount),
-              tax: 0,
-              shipping,
-              phone,
-              city,
-              address,
-              country,
-              name,
-              state,
+//         if (Boolean(userId)) {
+//           newOrder = await prisma.order.create({
+//             data: {
+//               refNo: reference,
+//               orderitem: JSON.stringify(order),
+//               total: amount,
+//               tax: 0,
+//               shipping,
+//               phone,
+//               city,
+//               address,
+//               country,
+//               name,
+//               state,
+//               arrivalDate: `${new Date().getDate() + 4}`,
+//               user: { connect: { id: userId } },
+//             },
+//           });
+//         } else {
+//           newOrder = await prisma.order.create({
+//             data: {
+//               refNo: reference,
+//               orderitem: order,
+//               total: Number(amount),
+//               tax: 0,
+//               shipping,
+//               phone,
+//               city,
+//               address,
+//               country,
+//               name,
+//               state,
 
-              arrivalDate: `${new Date().getDate() + 4}`,
-            },
-          });
-        }
-        res.status(StatusCodes.OK).json({
-          data: {
-            authorization_url,
-            newOrder,
-          },
-        });
-      });
-    })
-    .on("error", (error: any) => {
-      console.error(error);
-    });
+//               arrivalDate: `${new Date().getDate() + 4}`,
+//             },
+//           });
+//         }
+//         res.status(StatusCodes.OK).json({
+//           data: {
+//             authorization_url,
+//             newOrder,
+//           },
+//         });
+//       });
+//     })
+//     .on("error", (error: any) => {
+//       console.error(error);
+//     });
 
-  reqPaystack.write(params);
-  reqPaystack.end();
-});
+//   reqPaystack.write(params);
+//   reqPaystack.end();
+// });
 
-export const verifyPayment = expressAsyncHandler(async (req, res, next) => {
-  const reference = req.query.reference;
-  const https = require("https");
-  const options = {
-    hostname: process.env.paystackHostname,
-    port: process.env.paystackPort,
-    path: `/transaction/verify/:${reference}`,
-    method: "GET",
-    headers: {
-      Authorization: process.env.paystackAuthization,
-    },
-  };
+// export const verifyPayment = expressAsyncHandler(async (req, res, next) => {
+//   const reference = req.query.reference;
+//   const https = require("https");
+//   const options = {
+//     hostname: process.env.paystackHostname,
+//     port: process.env.paystackPort,
+//     path: `/transaction/verify/:${reference}`,
+//     method: "GET",
+//     headers: {
+//       Authorization: process.env.paystackAuthization,
+//     },
+//   };
 
-  https
-    .request(options, (resPaystack: any) => {
-      let data = "";
+//   https
+//     .request(options, (resPaystack: any) => {
+//       let data = "";
 
-      res.on("data", (chunk: any) => {
-        data += chunk;
-      });
-      const finalData = JSON.parse(data);
-      const { status, reference } = finalData.data;
+//       res.on("data", (chunk: any) => {
+//         data += chunk;
+//       });
+//       const finalData = JSON.parse(data);
+//       const { status, reference } = finalData.data;
 
-      res.on("end", async () => {
-        let confirmOrder;
-        confirmOrder = await prisma.order.findFirst({
-          where: {
-            refNo: reference,
-          },
-        });
+//       res.on("end", async () => {
+//         let confirmOrder;
+//         confirmOrder = await prisma.order.findFirst({
+//           where: {
+//             refNo: reference,
+//           },
+//         });
 
-        if (confirmOrder && confirmOrder.status === "success") {
-          confirmOrder = await prisma.order.update({
-            where: { id: confirmOrder.id },
-            data: {
-              status: status,
-            },
-          });
-        }
+//         if (confirmOrder && confirmOrder.status === "success") {
+//           confirmOrder = await prisma.order.update({
+//             where: { id: confirmOrder.id },
+//             data: {
+//               status: status,
+//             },
+//           });
+//         }
 
-        res.status(StatusCodes.OK).json({
-          finalData,
-          confirmOrder,
-        });
-      });
-    })
-    .on("error", (error: any) => {
-      console.error(error);
-    });
-});
+//         res.status(StatusCodes.OK).json({
+//           finalData,
+//           confirmOrder,
+//         });
+//       });
+//     })
+//     .on("error", (error: any) => {
+//       console.error(error);
+//     });
+// });
+
+// Paystack(process.env.paystackAuthization as string).subscription.create({
+//   customer:"",
+//   plan:"",
+//   authorization:"",
+//   start_date: new Date()
+// })
+
+// paystack.subscription.create({
+//     customer:"",
+//     plan:"",
+//     authorization:"",
+//     start_date: new Date()
+    
+// });
+
+// paystack.transaction.initialize({
+//   name:"Prince Omereji",
+//   amount:50000,
+//   email:"wisdomstanley2004@gmail.com",
+//   reference: `wisdomstanley2004@gmail.com${new Date().getTime()}`
+// })
+
+// paystack.subscription.disable({
+//   code:" subscription code",
+//   token:"email token"
+// })
+

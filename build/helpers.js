@@ -82,10 +82,16 @@ const sendEmail = function (content, to, subject) {
         };
         try {
             const transport = (0, nodemailer_1.createTransport)({
-                service: "gmail",
+                host: "mail.privateemail.com",
+                port: 465,
+                secure: true,
                 auth: {
                     user: process.env.EMAIL,
-                    pass: process.env.GMAIL_PASSWORD,
+                    pass: process.env.MAIL_PASSWORD,
+                },
+                tls: {
+                    // do not fail on invalid certs
+                    rejectUnauthorized: false,
                 },
             });
             const info = yield transport.sendMail(mailOption);

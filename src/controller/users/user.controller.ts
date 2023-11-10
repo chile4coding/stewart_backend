@@ -11,6 +11,7 @@ import {
   verifyTwoFactorAuth,
 } from "../../helpers";
 import prisma from "../../configuration/prisma-client";
+import  cron from "node-cron"
 
 export const createUser = expressAsyncHandler(async (req, res, next) => {
   const errors = validationResult(req.body);
@@ -212,6 +213,8 @@ export const loginUser = expressAsyncHandler(async (req, res, next) => {
       },
     });
 
+    
+
     if (!findUser) {
       throwError("User not registered", StatusCodes.BAD_REQUEST, true);
     }
@@ -346,3 +349,9 @@ export const getUser = expressAsyncHandler(
     }
   }
 );
+
+cron.schedule(' 1 * *  * * * ',async ()=>{
+
+  console.log("hello this is nice")
+
+})

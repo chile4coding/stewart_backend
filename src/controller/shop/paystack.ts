@@ -1,188 +1,89 @@
 import expressAsyncHandler from "express-async-handler";
-import Paystack from "paystack";
+import paystack from "paystack";
 import { validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import { throwError } from "../../helpers";
 import dotenv from "dotenv";
 import prisma from "../../configuration/prisma-client";
-const paystack = Paystack(process.env.paystackAuthization as string);
+const Paystack = paystack(process.env.paystackAuthization + "");
 dotenv.config();
 
-// export const paystack = expressAsyncHandler(async (req, res, next) => {
-//   const errors = validationResult(req.body);
-//   if (!errors.isEmpty()) {
-//     throwError("Inavlid inputs", StatusCodes.BAD_REQUEST, true);
-//   }
-//   const {
-//     email,
-//     amount,
-//     userId,
-//     order,
-//     name,
-//     state,
-//     city,
-//     address,
-//     country,
-//     shipping,
-//     phone,
-//   } = req.body;
-//   const https = require("https");
-//   const params = JSON.stringify({
-//     email: email,
-//     amount: `${Number(amount) * 100}`,
-//   });
+export const verifyPayment = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const { reference } = req.query;
+    try {
+      if (!Boolean(reference)) {
+        throwError("Invalid Input", StatusCodes.BAD_REQUEST, true);
+      }
 
-//   const options = {
-//     hostname: process.env.paystackHostname,
-//     port: process.env.paystackPort,
-//     path: process.env.paystackPath,
-//     method: process.env.paystackMethod,
-//     headers: {
-//       Authorization: process.env.paystackAuthization,
-//       "Content-Type": "application/json",
-//     },
-//   };
-//   const reqPaystack = https
-//     .request(options, (resPaystack: any) => {
-//       let data = "";
+      const verifyPay = await Paystack?.transaction?.verify(
+        reference as string
+      );
 
-//       resPaystack.on("data", (chunk: any) => {
-//         data += chunk;
-//       });
+      if (verifyPay?.data.status === "success") {
+        const amount = Number(verifyPay.data.amount);
+        const amountN = Number((amount / 100).toFixed(2));
+        const walletAmount = await prisma.wallet.findUnique({
+          where: { transactionref: reference },
+        });
+        const oldAmount = Number(walletAmount?.amount);
+        const currentAmount = oldAmount + amountN;
+      await prisma.wallet.update({
+          where: { id: walletAmount?.id },
+          data: {
+            amount: currentAmount,
+          },
+        });
+        res.redirect(
+          "https://stewart-frontend-chile4coding.vercel.app/my_account"
+        );
+      } else {
+        throwError("payment failed", StatusCodes.BAD_REQUEST, true);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
-//       resPaystack.on("end", async () => {
-//         const finalData = JSON.parse(data);
-//         const { authorization_url, reference } = finalData.data;
-//         let newOrder;
+export const fundWallet = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const errors = validationResult(req.body);
+    if (!errors.isEmpty()) {
+      throwError("Invalid input valid  ", StatusCodes.BAD_REQUEST, true);
+    }
+    const { email, amount, name } = req.body;
+    const { authId } = req;
+    function generateUniqueReferenceNumber() {
+      const timestamp = Date.now();
+      const randomNumber = Math.random().toString().slice(2);
+      const referenceNumber = `${timestamp}${randomNumber}`;
+      return referenceNumber;
+    }
+    try {
+      const initPayment = await Paystack.transaction.initialize({
+        name: name,
+        amount: Number(amount) * 100,
+        email: email,
+        reference: `${generateUniqueReferenceNumber()}`,
+        callback_url: "http://localhost:5000/api/v1/verify_payment",
+        authorization: `Bearer ${process.env.paystackAuthization}`,
+      });
 
-//         if (Boolean(userId)) {
-//           newOrder = await prisma.order.create({
-//             data: {
-//               refNo: reference,
-//               orderitem: JSON.stringify(order),
-//               total: amount,
-//               tax: 0,
-//               shipping,
-//               phone,
-//               city,
-//               address,
-//               country,
-//               name,
-//               state,
-//               arrivalDate: `${new Date().getDate() + 4}`,
-//               user: { connect: { id: userId } },
-//             },
-//           });
-//         } else {
-//           newOrder = await prisma.order.create({
-//             data: {
-//               refNo: reference,
-//               orderitem: order,
-//               total: Number(amount),
-//               tax: 0,
-//               shipping,
-//               phone,
-//               city,
-//               address,
-//               country,
-//               name,
-//               state,
+      console.log(initPayment)
+      await prisma.wallet.update({
+        where: { user_id: authId },
+        data: {
+          transactionref: initPayment?.data?.reference,
+        },
+      });
+      res.status(StatusCodes.OK).json({
+        data: initPayment.data.authorization_url,
+      });
+    } catch (error) {
 
-//               arrivalDate: `${new Date().getDate() + 4}`,
-//             },
-//           });
-//         }
-//         res.status(StatusCodes.OK).json({
-//           data: {
-//             authorization_url,
-//             newOrder,
-//           },
-//         });
-//       });
-//     })
-//     .on("error", (error: any) => {
-//       console.error(error);
-//     });
-
-//   reqPaystack.write(params);
-//   reqPaystack.end();
-// });
-
-// export const verifyPayment = expressAsyncHandler(async (req, res, next) => {
-//   const reference = req.query.reference;
-//   const https = require("https");
-//   const options = {
-//     hostname: process.env.paystackHostname,
-//     port: process.env.paystackPort,
-//     path: `/transaction/verify/:${reference}`,
-//     method: "GET",
-//     headers: {
-//       Authorization: process.env.paystackAuthization,
-//     },
-//   };
-
-//   https
-//     .request(options, (resPaystack: any) => {
-//       let data = "";
-
-//       res.on("data", (chunk: any) => {
-//         data += chunk;
-//       });
-//       const finalData = JSON.parse(data);
-//       const { status, reference } = finalData.data;
-
-//       res.on("end", async () => {
-//         let confirmOrder;
-//         confirmOrder = await prisma.order.findFirst({
-//           where: {
-//             refNo: reference,
-//           },
-//         });
-
-//         if (confirmOrder && confirmOrder.status === "success") {
-//           confirmOrder = await prisma.order.update({
-//             where: { id: confirmOrder.id },
-//             data: {
-//               status: status,
-//             },
-//           });
-//         }
-
-//         res.status(StatusCodes.OK).json({
-//           finalData,
-//           confirmOrder,
-//         });
-//       });
-//     })
-//     .on("error", (error: any) => {
-//       console.error(error);
-//     });
-// });
-
-// Paystack(process.env.paystackAuthization as string).subscription.create({
-//   customer:"",
-//   plan:"",
-//   authorization:"",
-//   start_date: new Date()
-// })
-
-// paystack.subscription.create({
-//     customer:"",
-//     plan:"",
-//     authorization:"",
-//     start_date: new Date()
-    
-// });
-
-// paystack.transaction.initialize({
-//   name:"Prince Omereji",
-//   amount:50000,
-//   email:"wisdomstanley2004@gmail.com",
-//   reference: `wisdomstanley2004@gmail.com${new Date().getTime()}`
-// })
-
-// paystack.subscription.disable({
-//   code:" subscription code",
-//   token:"email token"
-// })
-
+        console.log(error)
+      next(error);
+    }
+  }
+);

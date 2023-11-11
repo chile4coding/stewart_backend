@@ -1,15 +1,26 @@
 import { Router } from "express";
-import { check } from "express-validator";
+import { body, check } from "express-validator";
+import { fundWallet, verifyPayment } from "../controller/shop/paystack";
+import auth from "../middleware/auth";
 
 // import { param } from "express-validator";
 // import { paystack } from "../controller/shop/paystack";
 // import auth from "../middleware/auth";
 const router = Router();
 
-// router.post(
-//   "/create_payment",
-//   [check("email").isEmail().isEmpty(), check("amount").isEmpty()],
-//   paystack
-// );
+router.post(
+  "/fund_wallet",
+  [
+    check("email").isEmail().notEmpty(),
+    body("amount").notEmpty(),
+    body("name").notEmpty(),
+  ],
+  auth,
+  fundWallet
+);
+router.get(
+  "/verify_payment",
+  verifyPayment
+);
 
 export const paystackRoute = router;

@@ -119,6 +119,7 @@ model Wallet{
   amount Float @default(0)
   user User @relation(fields: [user_id], references: [id])
   user_id String @unique
+  transactionref String? @unique
 }
 
 model Order {

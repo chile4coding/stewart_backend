@@ -66,11 +66,11 @@ export const fundWallet = expressAsyncHandler(
         amount: Number(amount) * 100,
         email: email,
         reference: `${generateUniqueReferenceNumber()}`,
-        callback_url: "http://localhost:5000/api/v1/verify_payment",
+        callback_url: "https://stewart-r0co.onrender.com/api/v1/verify_payment",
         authorization: `Bearer ${process.env.paystackAuthization}`,
       });
 
-      console.log(initPayment)
+
       await prisma.wallet.update({
         where: { user_id: authId },
         data: {
@@ -82,7 +82,7 @@ export const fundWallet = expressAsyncHandler(
       });
     } catch (error) {
 
-        console.log(error)
+        
       next(error);
     }
   }

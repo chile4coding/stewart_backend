@@ -243,7 +243,7 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
   }
 
   try {
-    const { password, email, name, phone, country, state, city, address } =
+    const { email, name, phone, country, state, city, address } =
       req.body;
 
     const findUser = await prisma.user.findUnique({
@@ -256,7 +256,6 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
       throwError("User not registered", StatusCodes.BAD_REQUEST, true);
     }
 
-    await comparePassword(password, findUser?.passwords as string);
 
     const updateUser = await prisma.user.update({
       where: { email: findUser?.email },

@@ -8,6 +8,7 @@ import {
   loginUser,
   requestOtp,
   resetPassword,
+  updateProfile,
   verifyOtp,
 } from "../controller/users/user.controller";
 import { body } from "express-validator";
@@ -77,6 +78,21 @@ router.post(
     body("shippingType").notEmpty(),
   ],
   payOrderWithWallet
+);
+router.post(
+  "/update_user_profile",
+  auth,
+  [
+    body("email").notEmpty(),
+    body("name").notEmpty(),
+    body("state").notEmpty(),
+    body("city").notEmpty(),
+    body("address").notEmpty(),
+    body("country").notEmpty(),
+    body("phone").notEmpty(),
+
+  ],
+ updateProfile
 );
 router.get("/get_user", auth, getUser);
 router.get("/get_saved_items", auth, getSavedItems);

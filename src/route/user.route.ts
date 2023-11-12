@@ -12,6 +12,20 @@ import {
 } from "../controller/users/user.controller";
 import { body } from "express-validator";
 import { payOrderWithWallet } from "../controller/shop/order.controller";
+import {
+  deleteSavedItem,
+  getSavedItems,
+  saveItem,
+} from "../controller/shop/savedItems.controller";
+import {
+  deleteMessage,
+  getMessages,
+} from "../controller/shop/message.controller";
+import {
+  addreview,
+  deleteReviews,
+  getReviews,
+} from "../controller/shop/reviews";
 const router = Router();
 
 router.post(
@@ -64,9 +78,34 @@ router.post(
   ],
   payOrderWithWallet
 );
-router.get(
-  "/get_user",
+router.get("/get_user", auth, getUser);
+router.get("/get_saved_items", auth, getSavedItems);
+router.delete("/delete_saved_item", auth, deleteSavedItem);
+router.get("/get_messages", auth, getMessages);
+router.delete("/delete_messages", auth, deleteMessage);
+router.get("/get_reviews", auth, getReviews);
+router.delete("/delete_review", auth, deleteReviews);
+router.post(
+  "/add_review",
   auth,
-  getUser
+  [
+    body("rating").notEmpty(),
+    body("name").notEmpty(),
+    body("comment").notEmpty(),
+    body("productId").notEmpty(),
+  ],
+  addreview
+);
+router.post(
+  "/save_item",
+  auth,
+  [
+    body("name").notEmpty(),
+    body("image").notEmpty(),
+    body("id").notEmpty(),
+    body("status").notEmpty(),
+    body("amount").notEmpty(),
+  ],
+  saveItem
 );
 export const userRouter = router;

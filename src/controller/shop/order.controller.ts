@@ -171,6 +171,8 @@ export const getOrder = expressAsyncHandler(async (req, res, next) => {
   }
 });
 
+
+
 export const getAllOrder = expressAsyncHandler(
   async (req: Request | any, res, next) => {
     const { authId } = req;
@@ -319,7 +321,7 @@ export const payOrderWithWallet = expressAsyncHandler(
     });
       }
        
-    } catch (error) {
+    } catch (error) {3
       next(error);
     }
   }

@@ -149,6 +149,10 @@ model SaveItem{
   user_id String? @unique
   item Color ?  @relation(fields: [item_id], references: [id])
   item_id String? 
+  image String
+  name String
+  amount String
+  status Boolean
 }
 
 

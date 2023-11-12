@@ -48,3 +48,45 @@ export const addreview = expressAsyncHandler(
     }
   }
 );
+
+export const getReviews = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const { authId } = req;
+
+    try {
+      const reviews = await prisma.review.findMany({
+        where: {
+          user_id: authId,
+        },
+      });
+
+      res.status(StatusCodes.OK).json({
+        message: "Reviews fetched successfully",
+        reviews,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+export const deleteReviews = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const id = req.params.id;
+    try {
+      const reviews = await prisma.review.delete({
+        where: {
+          id,
+        },
+      });
+
+      if (!reviews) {
+        throwError("Error deleting review", StatusCodes.BAD_REQUEST, true);
+      }
+      res.status(StatusCodes.OK).json({
+        message: " Review deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);

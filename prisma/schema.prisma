@@ -125,6 +125,7 @@ model Wallet{
 model Order {
   id      String   @id @default(uuid())
   status  String?
+  placedOn String
   name String?
   email String?
   state String?

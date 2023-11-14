@@ -15,7 +15,7 @@ export const addreview = expressAsyncHandler(
     const authId = req.authId;
 
     try {
-      const { rating, name, comment, productId, avatar } = req.body;
+      const { rating, name, comment, productId } = req.body;
       // fetch hthe revie
       // check the user and the product Id if they are the same
       // update the review field
@@ -42,7 +42,7 @@ export const addreview = expressAsyncHandler(
       if (!user) {
         throwError("Unauthorizded user", StatusCodes.BAD_REQUEST, true);
       }
-     
+
       let userReview;
 
       if (!check) {
@@ -52,7 +52,7 @@ export const addreview = expressAsyncHandler(
             name: name as string,
             comment: comment,
             is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"
-            avatar: user?.avatar as string || " ",
+            avatar: (user?.avatar as string) || " ",
             date: `${new Date().toLocaleString("en-US")}`,
             product: { connect: { id: productId } },
             user: { connect: { id: user?.id } },
@@ -109,6 +109,30 @@ export const deleteReviews = expressAsyncHandler(
       }
       res.status(StatusCodes.OK).json({
         message: " Review deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+export const updateReview = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const { rating, comment, id } = req.body;
+
+    try {
+      const review = await prisma.review.update({
+        where: { id: id },
+        data: {
+          rating,
+          comment,
+        },
+      });
+      if (!review) {
+        throwError("Error updating review", StatusCodes.BAD_REQUEST, true);
+      }
+      res.status(StatusCodes.OK).json({
+        message: "Review updated successfully",
+        review,
       });
     } catch (error) {
       next(error);

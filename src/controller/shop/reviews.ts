@@ -96,7 +96,7 @@ export const getReviews = expressAsyncHandler(
 );
 export const deleteReviews = expressAsyncHandler(
   async (req: Request | any, res, next) => {
-    const id = req.params.id;
+    const { id } = req.body;
     try {
       const reviews = await prisma.review.delete({
         where: {

@@ -15,7 +15,7 @@ export const addreview = expressAsyncHandler(
     const authId = req.authId;
 
     try {
-      const { rating, name, comment, productId } = req.body;
+      const { rating, name, comment, productId, avatar } = req.body;
       // fetch hthe revie
       // check the user and the product Id if they are the same
       // update the review field
@@ -52,7 +52,7 @@ export const addreview = expressAsyncHandler(
             name: name as string,
             comment: comment,
             is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"
-            avatar: user?.avatar as string,
+            avatar: user?.avatar as string || " ",
             date: `${new Date().toLocaleString("en-US")}`,
             product: { connect: { id: productId } },
             user: { connect: { id: user?.id } },

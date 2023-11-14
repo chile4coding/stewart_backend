@@ -300,7 +300,11 @@ export const getProduct = expressAsyncHandler(async (req, res, next) => {
   try {
     const products = await prisma.product.findMany({
       include: {
-        reviews: true,
+        reviews: {
+          include:{
+            user:true
+          }
+        },
         size: {
           include: {
             colors: true,

@@ -93,8 +93,8 @@ save_items SaveItem[]
 
 model Review{
   id String @id @default(uuid())
-  rating Int
-  date DateTime 
+  rating String
+  date String 
   name String
   is_verified Boolean @default(false)
   comment String

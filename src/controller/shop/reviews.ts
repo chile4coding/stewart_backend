@@ -53,7 +53,7 @@ export const addreview = expressAsyncHandler(
             comment: comment,
             is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"
             avatar: user?.avatar as string,
-            date: new Date(),
+            date: `${new Date().toLocaleString("en-US")}`,
             product: { connect: { id: productId } },
             user: { connect: { id: user?.id } },
           },

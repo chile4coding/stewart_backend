@@ -16,6 +16,22 @@ export const addreview = expressAsyncHandler(
 
     try {
       const { rating, name, comment, productId } = req.body;
+      // fetch hthe revie
+      // check the user and the product Id if they are the same
+      // update the review field
+      // but if they are not the same then u need to create a new review
+
+      const review = await prisma.review.findMany({
+        where: { product_id: productId },
+      });
+
+      let check = false;
+
+      review.forEach((item) => {
+        if (item.user_id === authId && item.product_id === productId) {
+          check = true;
+        }
+      });
 
       const user = await prisma.user.findUnique({
         where: {
@@ -27,22 +43,31 @@ export const addreview = expressAsyncHandler(
         throwError("Unauthorizded user", StatusCodes.BAD_REQUEST, true);
       }
       const rate = Number(rating);
-      const userReview = await prisma.review.create({
-        data: {
-          rating: rate,
-          name: name as string,
-          comment: comment,
-          is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"
-          avatar: user?.avatar as string,
-          date: new Date(),
-          product: { connect: { id: productId } },
-          user: { connect: { id: user?.id } },
-        },
-      });
+      let userReview;
 
-      res.status(StatusCodes.CREATED).json({
-        review: userReview,
-      });
+      if (!check) {
+        userReview = await prisma.review.create({
+          data: {
+            rating: rate,
+            name: name as string,
+            comment: comment,
+            is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"
+            avatar: user?.avatar as string,
+            date: new Date(),
+            product: { connect: { id: productId } },
+            user: { connect: { id: user?.id } },
+          },
+        });
+
+        res.status(StatusCodes.CREATED).json({
+          messsage: "Review submitted successfully",
+          review: userReview,
+        });
+      } else {
+        res.status(StatusCodes.CREATED).json({
+          messsage: "Please go to review page to update review",
+        });
+      }
     } catch (error) {
       next(error);
     }

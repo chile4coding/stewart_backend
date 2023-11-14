@@ -74,10 +74,9 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
             amount: Number(amount) * 100,
             email: email,
             reference: `${generateUniqueReferenceNumber()}`,
-            callback_url: "http://localhost:5000/api/v1/verify_payment",
+            callback_url: "https://stewart-r0co.onrender.com/api/v1/verify_payment",
             authorization: `Bearer ${process.env.paystackAuthization}`,
         });
-        console.log(initPayment);
         yield prisma_client_1.default.wallet.update({
             where: { user_id: authId },
             data: {
@@ -89,7 +88,6 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 }));

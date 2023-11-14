@@ -36,6 +36,7 @@ exports.visitorCreateOrder = (0, express_async_handler_1.default)((req, res, nex
                 state,
                 city,
                 address,
+                placedOn: `${new Date().toDateString()}`,
                 status,
                 country,
                 shipping,
@@ -85,6 +86,7 @@ exports.registeredUserCreateOrder = (0, express_async_handler_1.default)((req, r
                 city,
                 address,
                 status,
+                placedOn: `${new Date().toDateString()}`,
                 country,
                 shipping,
                 phone,
@@ -195,6 +197,7 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
                 name,
                 state,
                 city,
+                placedOn: `${new Date().toDateString()}`,
                 address,
                 country,
                 status,
@@ -230,6 +233,7 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
         }
     }
     catch (error) {
+        3;
         next(error);
     }
 }));

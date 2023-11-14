@@ -207,7 +207,7 @@ exports.updateProfile = (0, express_async_handler_1.default)((req, res, next) =>
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
     try {
-        const { password, email, name, phone, country, state, city, address } = req.body;
+        const { email, name, phone, country, state, city, address } = req.body;
         const findUser = yield prisma_client_1.default.user.findUnique({
             where: {
                 email: email,
@@ -216,7 +216,6 @@ exports.updateProfile = (0, express_async_handler_1.default)((req, res, next) =>
         if (!findUser) {
             (0, helpers_1.throwError)("User not registered", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        yield (0, helpers_1.comparePassword)(password, findUser === null || findUser === void 0 ? void 0 : findUser.passwords);
         const updateUser = yield prisma_client_1.default.user.update({
             where: { email: findUser === null || findUser === void 0 ? void 0 : findUser.email },
             data: {

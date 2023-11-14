@@ -42,13 +42,13 @@ export const addreview = expressAsyncHandler(
       if (!user) {
         throwError("Unauthorizded user", StatusCodes.BAD_REQUEST, true);
       }
-      const rate = Number(rating);
+     
       let userReview;
 
       if (!check) {
         userReview = await prisma.review.create({
           data: {
-            rating: rate,
+            rating,
             name: name as string,
             comment: comment,
             is_verified: Boolean(user?.is_varified), // Assuming the correct property name is "is_verified" and not "is_varified"

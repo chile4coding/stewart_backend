@@ -48,7 +48,8 @@ exports.visitorCreateOrder = (0, express_async_handler_1.default)((req, res, nex
         });
         const items = orderitem
             .map((item) => {
-            let elm = `  <tr>
+            if (!item.hasOwnProperty("paymentMethod")) {
+                let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
                  <div style="max-width: 80px; margin-right: 10px">
@@ -64,7 +65,8 @@ exports.visitorCreateOrder = (0, express_async_handler_1.default)((req, res, nex
              <td style="border: 1px solid black; padding: 5px">${item.qty}</td>
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
-            return elm;
+                return elm;
+            }
         })
             .join("");
         const content = `
@@ -184,7 +186,8 @@ exports.registeredUserCreateOrder = (0, express_async_handler_1.default)((req, r
         });
         const items = orderitem
             .map((item) => {
-            let elm = `  <tr>
+            if (!item.hasOwnProperty("paymentMethod")) {
+                let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
                  <div style="max-width: 80px; margin-right: 10px">
@@ -200,7 +203,8 @@ exports.registeredUserCreateOrder = (0, express_async_handler_1.default)((req, r
              <td style="border: 1px solid black; padding: 5px">${item.qty}</td>
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
-            return elm;
+                return elm;
+            }
         })
             .join("");
         const content = `
@@ -390,7 +394,8 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
         });
         const items = orderitem
             .map((item) => {
-            let elm = `  <tr>
+            if (!item.hasOwnProperty("paymentMethod")) {
+                let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
                  <div style="max-width: 80px; margin-right: 10px">
@@ -406,7 +411,8 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
              <td style="border: 1px solid black; padding: 5px">${item.qty}</td>
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
-            return elm;
+                return elm;
+            }
         })
             .join("");
         const content = `

@@ -10,6 +10,7 @@ const product_controller_admin_1 = require("../controller/admin/product.controll
 // import auth from "../middleware/auth";
 const order_controller_1 = require("../controller/shop/order.controller");
 const auth_1 = __importDefault(require("../middleware/auth"));
+const reviews_1 = require("../controller/shop/reviews");
 const router = (0, express_1.Router)();
 router.get("/get_products", product_controller_admin_1.getProduct);
 router.get("/get_category", product_controller_admin_1.getCategory);
@@ -20,4 +21,5 @@ router.post("/get_track_order", order_controller_1.getOrder);
 router.post("/get_all_order", auth_1.default, order_controller_1.getAllOrder);
 router.post("/get_user_order", auth_1.default, order_controller_1.getUserOrder);
 router.post("/create_order_user", auth_1.default, order_controller_1.registeredUserCreateOrder);
+router.post("/update_review", auth_1.default, reviews_1.updateReview);
 exports.productRoute = router;

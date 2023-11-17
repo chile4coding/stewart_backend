@@ -48,7 +48,35 @@ exports.createUser = (0, express_async_handler_1.default)((req, res, next) => __
                 otp_secret: secret.base32,
             },
         });
-        const content = `<p>Click the link below and enter your OTP to verify your registeration</p> <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp">click</a></div><h2>${token}</h2>`;
+        const content = `
+  <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    <header
+      style="
+        text-align: center;
+        background-color:#d9d9d9;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        justify-content: center;
+      ">
+      <img
+        src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+        alt="Stewart Collection Logo"
+        style="max-width: 200px; max-width: 60px" />
+      <h1>
+        <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      </h1>
+    </header>
+   
+     <p>Click the link below and enter your OTP to verify your registeration</p>
+      <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp">click</a></div>
+      <h2>${token}</h2>
+        <footer style="text-align: center; margin-top: 20px">
+      <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+    </footer>
+  </body>
+
+      `;
         const subject = "Stewart Collections OTP Registration";
         yield (0, helpers_1.sendEmail)(content, user === null || user === void 0 ? void 0 : user.email, subject);
         yield prisma_client_1.default.wallet.create({
@@ -124,7 +152,33 @@ exports.requestOtp = (0, express_async_handler_1.default)((req, res, next) => __
         if (!userOtpupdate) {
             (0, helpers_1.throwError)("user not found", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const content = `<p>Click the link below and enter your OTP to verify your OTP</p> <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp?">click</a></div><h2>${token}</h2>`;
+        const content = `<body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    <header
+      style="
+        text-align: center;
+        background-color:#d9d9d9;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        justify-content: center;
+      ">
+      <img
+        src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+        alt="Stewart Collection Logo"
+        style="max-width: 200px; max-width: 60px" />
+      <h1>
+        <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      </h1>
+    </header>
+     <p>Click the link below and enter your OTP to verify your OTP</p> 
+     <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp?">click</a></div>
+     <h2>${token}</h2>
+       <footer style="text-align: center; margin-top: 20px">
+      <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+    </footer>
+  </body>
+
+      `;
         const subject = "Stewart Collections OTP Request";
         yield (0, helpers_1.sendEmail)(content, findUser === null || findUser === void 0 ? void 0 : findUser.email, subject);
         res.status(http_status_codes_1.StatusCodes.OK).json({
@@ -300,6 +354,6 @@ exports.getUser = (0, express_async_handler_1.default)((req, res, next) => __awa
         next(error);
     }
 }));
-node_cron_1.default.schedule(' 1 * *  * * * ', () => __awaiter(void 0, void 0, void 0, function* () {
+node_cron_1.default.schedule(" 1 * *  * * * ", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("hello this is nice");
 }));

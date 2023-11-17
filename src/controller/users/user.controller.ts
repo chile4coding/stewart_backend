@@ -11,7 +11,7 @@ import {
   verifyTwoFactorAuth,
 } from "../../helpers";
 import prisma from "../../configuration/prisma-client";
-import  cron from "node-cron"
+import cron from "node-cron";
 
 export const createUser = expressAsyncHandler(async (req, res, next) => {
   const errors = validationResult(req.body);
@@ -44,7 +44,37 @@ export const createUser = expressAsyncHandler(async (req, res, next) => {
         otp_secret: secret.base32,
       },
     });
-    const content = `<p>Click the link below and enter your OTP to verify your registeration</p> <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp">click</a></div><h2>${token}</h2>`;
+
+    const content = `
+  <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    <header
+      style="
+        text-align: center;
+        background-color:#d9d9d9;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        justify-content: center;
+      ">
+      <img
+        src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+        alt="Stewart Collection Logo"
+        style="max-width: 200px; max-width: 60px" />
+      <h1>
+        <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      </h1>
+    </header>
+   
+     <p>Click the link below and enter your OTP to verify your registeration</p>
+      <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp">click</a></div>
+      <h2>${token}</h2>
+        <footer style="text-align: center; margin-top: 20px">
+      <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+    </footer>
+  </body>
+
+      `;
+
     const subject = "Stewart Collections OTP Registration";
 
     await sendEmail(content, user?.email as string, subject);
@@ -138,7 +168,36 @@ export const requestOtp = expressAsyncHandler(async (req, res, next) => {
     if (!userOtpupdate) {
       throwError("user not found", StatusCodes.BAD_REQUEST, true);
     }
-    const content = `<p>Click the link below and enter your OTP to verify your OTP</p> <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp?">click</a></div><h2>${token}</h2>`;
+
+     const content = `<body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    <header
+      style="
+        text-align: center;
+        background-color:#d9d9d9;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        justify-content: center;
+      ">
+      <img
+        src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+        alt="Stewart Collection Logo"
+        style="max-width: 200px; max-width: 60px" />
+      <h1>
+        <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      </h1>
+    </header>
+     <p>Click the link below and enter your OTP to verify your OTP</p> 
+     <div><a href="https://stewart-frontend-chile4coding.vercel.app/otp?">click</a></div>
+     <h2>${token}</h2>
+       <footer style="text-align: center; margin-top: 20px">
+      <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+    </footer>
+  </body>
+
+      `;
+
+    
     const subject = "Stewart Collections OTP Request";
 
     await sendEmail(content, findUser?.email as string, subject);
@@ -213,8 +272,6 @@ export const loginUser = expressAsyncHandler(async (req, res, next) => {
       },
     });
 
-    
-
     if (!findUser) {
       throwError("User not registered", StatusCodes.BAD_REQUEST, true);
     }
@@ -243,8 +300,7 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
   }
 
   try {
-    const { email, name, phone, country, state, city, address } =
-      req.body;
+    const { email, name, phone, country, state, city, address } = req.body;
 
     const findUser = await prisma.user.findUnique({
       where: {
@@ -255,7 +311,6 @@ export const updateProfile = expressAsyncHandler(async (req, res, next) => {
     if (!findUser) {
       throwError("User not registered", StatusCodes.BAD_REQUEST, true);
     }
-
 
     const updateUser = await prisma.user.update({
       where: { email: findUser?.email },
@@ -349,8 +404,6 @@ export const getUser = expressAsyncHandler(
   }
 );
 
-cron.schedule(' 1 * *  * * * ',async ()=>{
-
-  console.log("hello this is nice")
-
-})
+cron.schedule(" 1 * *  * * * ", async () => {
+  console.log("hello this is nice");
+});

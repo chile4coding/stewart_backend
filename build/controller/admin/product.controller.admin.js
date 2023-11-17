@@ -272,6 +272,11 @@ exports.getProduct = (0, express_async_handler_1.default)((req, res, next) => __
     try {
         const products = yield prisma_client_1.default.product.findMany({
             include: {
+                reviews: {
+                    include: {
+                        user: true
+                    }
+                },
                 size: {
                     include: {
                         colors: true,

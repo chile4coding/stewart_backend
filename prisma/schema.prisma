@@ -147,7 +147,7 @@ model Order {
 model SaveItem{
   id String @id @default(uuid())
   user    User ?    @relation(fields: [user_id], references: [id])
-  user_id String? @unique
+  user_id String? 
   item Color ?  @relation(fields: [item_id], references: [id])
   item_id String? 
   image String

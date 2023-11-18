@@ -55,8 +55,8 @@ export const saveItem = expressAsyncHandler(
 
     try {
       if (convertFalseToBoolean(status)) {
-        const savedItem = await prisma.saveItem.delete({
-          where: { id: id },
+        const savedItem = await prisma.saveItem.deleteMany({
+          where: { item_id: id },
         });
         res.send(StatusCodes.OK).json({
           savedItem,
@@ -68,7 +68,8 @@ export const saveItem = expressAsyncHandler(
             image: image as string,
             amount: amount,
             status: convertFalseToBoolean(status),
-            user: { connect: { id: authId } },
+            user: { connect: { id: authId as string } },
+            item_id: id
           },
         });
         res.send(StatusCodes.OK).json({

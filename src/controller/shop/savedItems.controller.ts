@@ -22,7 +22,7 @@ export const getSavedItems = expressAsyncHandler(
 );
 
 export const deleteSavedItem = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.params;
+  const { id } = req.body;
   try {
     const savedItem = await prisma.saveItem.delete({
       where: {

@@ -149,8 +149,8 @@ model SaveItem{
   user    User ?    @relation(fields: [user_id], references: [id])
   user_id String? 
   item_id String? 
-  image String
-  name String
+  image String?
+  name String?
   amount String
   status Boolean
 }

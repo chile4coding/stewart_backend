@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('pending', 'success', 'cancelled');
+CREATE TYPE "ShippingType" AS ENUM ('standard', 'express');
 
 -- CreateTable
 CREATE TABLE "Store" (
@@ -29,6 +29,7 @@ CREATE TABLE "Product" (
     "initial_size" TEXT,
     "subscriber_price" DOUBLE PRECISION,
     "initial_color" TEXT,
+    "short_desc" TEXT,
     "description" TEXT,
     "category_id" TEXT NOT NULL,
 
@@ -39,6 +40,9 @@ CREATE TABLE "Product" (
 CREATE TABLE "Size" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "waist" TEXT,
+    "length" TEXT,
+    "sleaves" TEXT,
     "product_id" TEXT,
 
     CONSTRAINT "Size_pkey" PRIMARY KEY ("id")
@@ -65,6 +69,10 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "gender" TEXT,
     "phone" TEXT,
+    "otp" TEXT,
+    "verify_otp" BOOLEAN NOT NULL,
+    "otp_secret" TEXT NOT NULL,
+    "otp_trial" TEXT NOT NULL,
     "passwords" TEXT NOT NULL,
     "dob" TEXT NOT NULL,
     "city" TEXT,
@@ -80,8 +88,8 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Review" (
     "id" TEXT NOT NULL,
-    "rating" INTEGER NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
+    "rating" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "comment" TEXT NOT NULL,
@@ -107,6 +115,7 @@ CREATE TABLE "Wallet" (
     "id" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "user_id" TEXT NOT NULL,
+    "transactionref" TEXT,
 
     CONSTRAINT "Wallet_pkey" PRIMARY KEY ("id")
 );
@@ -114,9 +123,12 @@ CREATE TABLE "Wallet" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
-    "status" "Status" NOT NULL DEFAULT 'pending',
+    "status" TEXT,
+    "placedOn" TEXT NOT NULL,
     "name" TEXT,
+    "email" TEXT,
     "state" TEXT,
+    "shippingType" "ShippingType" NOT NULL DEFAULT 'standard',
     "city" TEXT,
     "address" TEXT,
     "country" TEXT,
@@ -137,6 +149,10 @@ CREATE TABLE "SaveItem" (
     "id" TEXT NOT NULL,
     "user_id" TEXT,
     "item_id" TEXT,
+    "image" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "amount" TEXT NOT NULL,
+    "status" BOOLEAN NOT NULL,
 
     CONSTRAINT "SaveItem_pkey" PRIMARY KEY ("id")
 );
@@ -161,10 +177,16 @@ CREATE TABLE "Admin" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_otp_key" ON "User"("otp");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_otp_trial_key" ON "User"("otp_trial");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Wallet_user_id_key" ON "Wallet"("user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SaveItem_user_id_key" ON "SaveItem"("user_id");
+CREATE UNIQUE INDEX "Wallet_transactionref_key" ON "Wallet"("transactionref");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
@@ -195,6 +217,3 @@ ALTER TABLE "Order" ADD CONSTRAINT "Order_user_id_fkey" FOREIGN KEY ("user_id") 
 
 -- AddForeignKey
 ALTER TABLE "SaveItem" ADD CONSTRAINT "SaveItem_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SaveItem" ADD CONSTRAINT "SaveItem_item_id_fkey" FOREIGN KEY ("item_id") REFERENCES "Color"("id") ON DELETE SET NULL ON UPDATE CASCADE;

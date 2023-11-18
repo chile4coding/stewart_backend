@@ -62,7 +62,7 @@ model Color{
   subscriber_price Float
 size Size? @relation(fields: [size_id], references: [id])
 size_id String?
-save_item SaveItem[]
+
 }
 
 model User{
@@ -148,7 +148,6 @@ model SaveItem{
   id String @id @default(uuid())
   user    User ?    @relation(fields: [user_id], references: [id])
   user_id String? 
-  item Color ?  @relation(fields: [item_id], references: [id])
   item_id String? 
   image String
   name String

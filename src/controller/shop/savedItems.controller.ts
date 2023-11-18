@@ -56,7 +56,7 @@ export const saveItem = expressAsyncHandler(
     try {
       if (convertFalseToBoolean(status)) {
         const savedItem = await prisma.saveItem.deleteMany({
-          where: { item_id: id },
+          where: { item_id: id, user_id: authId  as string},
         });
         res.send(StatusCodes.OK).json({
           savedItem,

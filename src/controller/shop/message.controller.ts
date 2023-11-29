@@ -96,29 +96,32 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
     if (!admin) {
       throwError("Unauthorized Admin", StatusCodes.BAD_REQUEST, true);
     }
-
     const customers = await prisma.user.findMany({});
-    for (const user of customers) {
+
+    async function createMessage(title: string, message: string, id: String) {
       await prisma.inbox.create({
         data: {
           title,
           message,
-          user: { connect: { id: user?.id } },
+          user: { connect: { id: id as string } },
           date: `${new Date().toLocaleDateString("en-UK")}`,
         },
       });
 
-         await prisma.notifications.create({
-           data: {
-             notification: "New message received",
-             link: "/message",
-             user: { connect: { id: user?.id } },
-             date: new Date().getTime(),
-           },
-         });
+      await prisma.notifications.create({
+        data: {
+          notification: "New message received",
+          link: "/message",
+          user: { connect: { id: id as string } },
+          date: new Date().getTime(),
+        },
+      });
     }
 
-  
+    for (const user of customers) {
+      await createMessage(title, message, user.id);
+    }
+
     socket.emit("new-message");
     res.status(StatusCodes.OK).json({
       message: "Message sent",
@@ -130,11 +133,11 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
 export const adminMessage = expressAsyncHandler(async (req: any, res, next) => {
   const { authId } = req;
   try {
-     const admin = await prisma.admin.findUnique({ where: { id: authId } });
+    const admin = await prisma.admin.findUnique({ where: { id: authId } });
 
-     if (!admin) {
-       throwError("Unauthorized Admin", StatusCodes.BAD_REQUEST, true);
-     }
+    if (!admin) {
+      throwError("Unauthorized Admin", StatusCodes.BAD_REQUEST, true);
+    }
 
     const messages = await prisma.inbox.findMany({});
 

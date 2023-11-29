@@ -98,7 +98,7 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
     }
 
     const customers = await prisma.user.findMany({});
-    customers.forEach(async (user) => {
+    for (const user of customers) {
       await prisma.inbox.create({
         data: {
           title,
@@ -108,16 +108,17 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
         },
       });
 
-      await prisma.notifications.create({
-        data: {
-          notification: "New message received",
-          link: "/message",
-          user: { connect: { id: user?.id } },
-          date: new Date().getTime(),
-        },
-      });
-    });
+         await prisma.notifications.create({
+           data: {
+             notification: "New message received",
+             link: "/message",
+             user: { connect: { id: user?.id } },
+             date: new Date().getTime(),
+           },
+         });
+    }
 
+  
     socket.emit("new-message");
     res.status(StatusCodes.OK).json({
       message: "Message sent",

@@ -113,7 +113,7 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
           notification: "New message received",
           link: "/message",
           user: { connect: { id: id as string } },
-          date: new Date().getTime(),
+          date: `${new Date().getTime()}`,
         },
       });
     }

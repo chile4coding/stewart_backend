@@ -89,6 +89,7 @@ name String
   orders Order[]
   is_varified Boolean @default(false)
 save_items SaveItem[]
+notifications Notifications[]
 }
 
 model Review{
@@ -109,7 +110,8 @@ model Review{
 model Inbox{
   id  String @id @default(uuid())
   date DateTime
-  message String
+  message String?
+  title String?
   user User @relation(fields: [user_id], references: [id])
   user_id String 
 }
@@ -175,4 +177,15 @@ email String @unique
 avatar_url String?
 
 
+}
+
+model Notifications{
+    id String @id @default(uuid())
+    notification String?
+    link String?
+    user    User ?    @relation(fields: [user_id], references: [id])
+  user_id String?  
+  date Int
+
+    
 }

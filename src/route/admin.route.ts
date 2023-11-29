@@ -12,6 +12,7 @@ import { createAdmin, loginAdmin } from "../controller/admin/admin.controller";
 import { param, body, check } from "express-validator";
 
 import auth from "../middleware/auth";
+import { adminMessage, deleteMessage, deleteNotification, getMessages, getNotifications, sendMessage } from "../controller/shop/message.controller";
 const router = Router();
 
 router.post(
@@ -62,6 +63,36 @@ router.post(
   auth,
 
   createOrUpdateClothColor
+);
+router.post(
+  "/create_message",
+  auth,
+  sendMessage
+);
+router.get(
+  "/messages",
+  auth,
+  getMessages
+);
+router.delete(
+  "/messages",
+  auth,
+  deleteMessage
+);
+router.delete(
+  "/notification",
+  auth,
+  deleteNotification
+);
+router.get(
+  "/notification",
+  auth,
+ getNotifications
+);
+router.get(
+  "/admin_get_message",
+  auth,
+ adminMessage
 );
 
 export const adminRoute = router;

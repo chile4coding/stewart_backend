@@ -61,6 +61,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.7",
     "paystack": "^2.0.1",
+    "socket.io": "^4.7.2",
     "speakeasy": "^2.0.0",
     "statuscode": "^0.0.0"
   },

@@ -109,7 +109,7 @@ model Review{
 
 model Inbox{
   id  String @id @default(uuid())
-  date DateTime
+  date String?
   message String?
   title String?
   user User @relation(fields: [user_id], references: [id])

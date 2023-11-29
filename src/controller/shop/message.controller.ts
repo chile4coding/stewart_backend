@@ -96,7 +96,7 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
     if (!admin) {
       throwError("Unauthorized Admin", StatusCodes.BAD_REQUEST, true);
     }
-    const customers = await prisma.user.findMany({});
+    const customers = await prisma.user.findMany();
 
     async function createMessage(title: string, message: string, id: String) {
       await prisma.inbox.create({
@@ -119,7 +119,7 @@ export const sendMessage = expressAsyncHandler(async (req: any, res, next) => {
     }
 
     for (const user of customers) {
-      await createMessage(title, message, user.id);
+       createMessage(title, message, user.id);
     }
 
     socket.emit("new-message");
@@ -139,7 +139,7 @@ export const adminMessage = expressAsyncHandler(async (req: any, res, next) => {
       throwError("Unauthorized Admin", StatusCodes.BAD_REQUEST, true);
     }
 
-    const messages = await prisma.inbox.findMany({});
+    const messages = await prisma.inbox.findMany();
 
     res.status(StatusCodes.OK).json({
       message: "Message  fetched successfully",

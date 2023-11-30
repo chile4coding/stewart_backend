@@ -11,15 +11,13 @@ dotenv.config();
 export const getMessages = expressAsyncHandler(
   async (req: Request | any, res, next) => {
     const { authId } = req;
-    console.log("this is coming from find auth id============= ", authId)
     try {
       const inbox = await prisma.inbox.findMany({
         where: { user_id: authId },
       });
-      console.log("this is coming from find inboxex============= ", inbox)
 
       
-      res.send(StatusCodes.OK).json({
+      res.status(StatusCodes.OK).json({
         message: "Messages successfullly fetched",
         inbox,
       });
@@ -35,7 +33,7 @@ export const getNotifications = expressAsyncHandler(
       const inbox = await prisma.notifications.findMany({
         where: { user_id: authId },
       });
-      res.send(StatusCodes.OK).json({
+      res.status(StatusCodes.OK).json({
         message: "Notifications successfullly fetched",
         inbox,
       });

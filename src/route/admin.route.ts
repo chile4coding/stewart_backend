@@ -70,7 +70,7 @@ router.post(
   sendMessage
 );
 router.get(
-  "/messages",
+  "/get_messages",
   auth,
   getMessages
 );
@@ -85,7 +85,7 @@ router.delete(
   deleteNotification
 );
 router.get(
-  "/notification",
+  "/get_notification",
   auth,
  getNotifications
 );

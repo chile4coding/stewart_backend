@@ -55,6 +55,7 @@ export const deleteMessage = expressAsyncHandler(
       if (!message) {
         throwError("Error deleting message", StatusCodes.BAD_REQUEST, true);
       }
+          socket.emit("new-message");
       res.status(StatusCodes.OK).json({
         message: "Message deleted successfully",
       });

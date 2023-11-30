@@ -12,7 +12,7 @@ export const getSavedItems = expressAsyncHandler(
       const savedItems = await prisma.saveItem.findMany({
         where: { user_id: authId },
       });
-      res.send(StatusCodes.OK).json({
+      res.status(StatusCodes.OK).json({
         savedItems,
       });
     } catch (error) {
@@ -58,7 +58,7 @@ export const saveItem = expressAsyncHandler(
         const savedItem = await prisma.saveItem.deleteMany({
           where: { item_id: id, user_id: authId  as string},
         });
-        res.send(StatusCodes.OK).json({
+        res.status(StatusCodes.OK).json({
           savedItem,
         });
       } else {
@@ -72,7 +72,7 @@ export const saveItem = expressAsyncHandler(
             item_id: id
           },
         });
-        res.send(StatusCodes.OK).json({
+        res.status(StatusCodes.OK).json({
           saved,
         });
       }

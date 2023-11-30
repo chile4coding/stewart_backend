@@ -42,8 +42,7 @@ export const deleteSavedItem = expressAsyncHandler(async (req, res, next) => {
 
 export const saveItem = expressAsyncHandler(
   async (req: Request | any, res, next) => {
-
-    function convertFalseToBoolean(value : string) {
+    function convertFalseToBoolean(value: string) {
       if (typeof value === "string" && value === "false") {
         return false;
       } else {
@@ -56,12 +55,18 @@ export const saveItem = expressAsyncHandler(
     try {
       if (convertFalseToBoolean(status)) {
         const savedItem = await prisma.saveItem.deleteMany({
-          where: { item_id: id, user_id: authId  as string},
+          where: { item_id: id, user_id: authId as string },
         });
         res.status(StatusCodes.OK).json({
           savedItem,
         });
-      } else {
+      } else if (
+        status === undefined ||
+        status === false ||
+        status === "false" ||
+        status === null ||
+        status === "undefined"
+      ) {
         const saved = await prisma.saveItem.create({
           data: {
             name: name as string,
@@ -69,7 +74,7 @@ export const saveItem = expressAsyncHandler(
             amount: amount,
             status: convertFalseToBoolean(status),
             user: { connect: { id: authId as string } },
-            item_id: id
+            item_id: id,
           },
         });
         res.status(StatusCodes.OK).json({

@@ -43,7 +43,7 @@ export const deleteSavedItem = expressAsyncHandler(async (req, res, next) => {
 export const saveItem = expressAsyncHandler(
   async (req: Request | any, res, next) => {
     function convertFalseToBoolean(value: string) {
-      if (typeof value === "string" && value === "false") {
+      if (typeof value === "string" && value === "false"  || value === "undefined" || value === undefined) {
         return false;
       } else {
         return Boolean(value);
@@ -60,13 +60,7 @@ export const saveItem = expressAsyncHandler(
         res.status(StatusCodes.OK).json({
           savedItem,
         });
-      } else if (
-        status === undefined ||
-        status === false ||
-        status === "false" ||
-        status === null ||
-        status === "undefined"
-      ) {
+      } else {
         const saved = await prisma.saveItem.create({
           data: {
             name: name as string,

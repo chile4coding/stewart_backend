@@ -13,6 +13,7 @@ import { param, body, check } from "express-validator";
 
 import auth from "../middleware/auth";
 import { adminMessage, deleteMessage, deleteNotification, getMessages, getNotifications, sendMessage } from "../controller/shop/message.controller";
+import { getAdminOrder, getAdminReviews } from "../controller/shop/order.controller";
 const router = Router();
 
 router.post(
@@ -94,5 +95,8 @@ router.get(
   auth,
  adminMessage
 );
+
+router.get("/admin_get_orders",auth, getAdminOrder )
+router.get("/admin_get_reviews",auth, getAdminReviews )
 
 export const adminRoute = router;

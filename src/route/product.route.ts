@@ -18,7 +18,6 @@ import {
 import auth from "../middleware/auth";
 import { updateReview } from "../controller/shop/reviews";
 const router = Router();
-
 router.get("/get_products", getProduct);
 router.get("/get_category", getCategory);
 router.get("/get_sizes", getSizes);
@@ -29,5 +28,9 @@ router.post("/get_all_order", auth, getAllOrder);
 router.post("/get_user_order", auth, getUserOrder);
 router.post("/create_order_user", auth, registeredUserCreateOrder);
 router.post("/update_review", auth, updateReview);
+
+// ?addmin get items
+
+
 
 export const productRoute = router;

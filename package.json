@@ -40,6 +40,7 @@
     "@types/nodemailer": "^6.4.13",
     "@types/paystack": "^2.0.4",
     "@types/speakeasy": "^2.0.9",
+    "@types/useragent": "^2.3.4",
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -63,7 +64,8 @@
     "paystack": "^2.0.1",
     "socket.io": "^4.7.2",
     "speakeasy": "^2.0.0",
-    "statuscode": "^0.0.0"
+    "statuscode": "^0.0.0",
+    "useragent": "^2.3.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

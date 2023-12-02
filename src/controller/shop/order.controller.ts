@@ -5,6 +5,7 @@ import prisma from "../../configuration/prisma-client";
 import expressAsyncHandler from "express-async-handler";
 import auth from "../../middleware/auth";
 import { validationResult } from "express-validator";
+import userAgent  from "useragent"
 dotenv.config();
 
 export const visitorCreateOrder = expressAsyncHandler(
@@ -54,8 +55,7 @@ export const visitorCreateOrder = expressAsyncHandler(
       });
       const items = orderitem
         .map((item: any) => {
-          if (!item.hasOwnProperty("paymentMethod")){
-            
+          if (!item.hasOwnProperty("paymentMethod")) {
             let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
@@ -73,9 +73,8 @@ export const visitorCreateOrder = expressAsyncHandler(
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
 
-           return elm;
+            return elm;
           }
-
         })
         .join("");
 
@@ -223,10 +222,10 @@ export const registeredUserCreateOrder = expressAsyncHandler(
         },
       });
 
-       const items = orderitem
-         .map((item: any) => {
-           if (!item.hasOwnProperty("paymentMethod")) {
-             let elm = `  <tr>
+      const items = orderitem
+        .map((item: any) => {
+          if (!item.hasOwnProperty("paymentMethod")) {
+            let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
                  <div style="max-width: 80px; margin-right: 10px">
@@ -243,12 +242,12 @@ export const registeredUserCreateOrder = expressAsyncHandler(
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
 
-             return elm;
-           }
-         })
-         .join("");
+            return elm;
+          }
+        })
+        .join("");
 
-    const content = `
+      const content = `
   <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
     <header
       style="
@@ -483,10 +482,10 @@ export const payOrderWithWallet = expressAsyncHandler(
         },
       });
 
-         const items = orderitem
-           .map((item: any) => {
-             if (!item.hasOwnProperty("paymentMethod")) {
-               let elm = `  <tr>
+      const items = orderitem
+        .map((item: any) => {
+          if (!item.hasOwnProperty("paymentMethod")) {
+            let elm = `  <tr>
              <td style="border: 1px solid black; padding: 5px">
                <div style="display: flex; gap: 20px; align-items: center;">
                  <div style="max-width: 80px; margin-right: 10px">
@@ -503,10 +502,10 @@ export const payOrderWithWallet = expressAsyncHandler(
              <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
            </tr>`;
 
-               return elm;
-             }
-           })
-           .join("");
+            return elm;
+          }
+        })
+        .join("");
 
       const content = `
   <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
@@ -596,3 +595,46 @@ export const payOrderWithWallet = expressAsyncHandler(
     }
   }
 );
+
+export const getAdminOrder = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
+
+      if (!admin) {
+        throwError("Unauthorized admin", StatusCodes.BAD_REQUEST, true);
+      }
+      const orders = await prisma.order.findMany();
+
+      res.status(StatusCodes.OK).json({
+        message: "orders fetched successfully",
+        orders,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+export const getAdminReviews = expressAsyncHandler(async (req: any, res, next) => {
+  const { authId } = req;
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { id: authId },
+    });
+
+    if (!admin) {
+      throwError("Unauthorized admin", StatusCodes.BAD_REQUEST, true);
+    }
+    const reviews = await prisma.review.findMany();
+    res.status(StatusCodes.OK).json({
+      message: "reviews fetched successfully",
+      reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+});

@@ -119,7 +119,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
           data: {
             name: name,
             price: pr,
-            short_desc:short_desc,
+            short_desc: short_desc,
             initial_color: initialColor,
             initial_size: initialSize,
             description: description,
@@ -142,7 +142,7 @@ export const createOrUpdateProduct = expressAsyncHandler(
             name: name,
             price: Number(Number(price).toFixed(2)),
             initial_color: initialColor,
-            short_desc:short_desc,
+            short_desc: short_desc,
             initial_size: initialSize,
             description: description,
             categoryName: productCategory?.name,
@@ -190,7 +190,7 @@ export const createOrUpdateSize = expressAsyncHandler(
         data: {
           name: name,
           waist: waist,
-          length:length,
+          length: length,
           sleaves: sleaves,
           product: { connect: { id: productId } },
         },
@@ -274,18 +274,8 @@ export const createOrUpdateClothColor = expressAsyncHandler(
   }
 );
 
-export const getCategory = expressAsyncHandler(async (req:any, res, next) => {
+export const getCategory = expressAsyncHandler(async (req: any, res, next) => {
   try {
-
-    if(!req.session.visited){
-      await prisma.visitor.create({
-        data:{
-          isvistor:true
-        }
-      })
-      req.session.visited  =  true
-
-    }
     const category = await prisma.category.findMany({
       include: {
         product: {
@@ -311,15 +301,14 @@ export const getProduct = expressAsyncHandler(async (req, res, next) => {
     const products = await prisma.product.findMany({
       include: {
         reviews: {
-          include:{
-            user:true
-          }
+          include: {
+            user: true,
+          },
         },
         size: {
           include: {
             colors: true,
           },
-          
         },
       },
     });
@@ -412,3 +401,17 @@ export const removeAProductColor = expressAsyncHandler(
     }
   }
 );
+export const checkVisitor = expressAsyncHandler(async (req, res, next) => {
+  try {
+    await prisma.visitor.create({
+      data: {
+        isvistor: true,
+      },
+    });
+    res.status(StatusCodes.OK).json({
+      message: "visitor counted",
+    });
+  } catch (error) {
+    next(error);
+  }
+});

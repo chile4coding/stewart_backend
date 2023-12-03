@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   secret: "stewartsecrekey",
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false
 }))
 
 app.use(morgan("dev"));

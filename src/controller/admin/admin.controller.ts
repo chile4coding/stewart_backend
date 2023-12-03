@@ -84,3 +84,46 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+export const adminGetAllUsers = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
+      if (!admin) {
+        throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+      }
+
+      const users = await prisma.user.findMany();
+      res.status(StatusCodes.OK).json({
+        message: "users fetched successfully",
+        users,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+export const getVistors = expressAsyncHandler(async (req: any, res, next) => {
+  const { authId } = req;
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { id: authId },
+    });
+    if (!admin) {
+      throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+    }
+    const visitors = await prisma.visitor.findMany();
+
+    res.status(StatusCodes.OK).json({
+      message: "visitor fetched successfully",
+      visitors,
+    });
+  } catch (error) {
+    next(error);
+  }
+});

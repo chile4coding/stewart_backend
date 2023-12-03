@@ -23,12 +23,18 @@ const errorhandler_1 = __importDefault(require("./middleware/errorhandler"));
 const cors_1 = __importDefault(require("cors"));
 const route_1 = __importDefault(require("./route/route"));
 const server_2 = require("./server/server");
+const express_session_1 = __importDefault(require("express-session"));
 dotenv_1.default.config();
 server_1.app.use((0, cors_1.default)({
     origin: "*",
 }));
 server_1.app.use(body_parser_1.default.json());
 server_1.app.use(body_parser_1.default.urlencoded({ extended: false }));
+server_1.app.use((0, express_session_1.default)({
+    secret: "stewartsecrekey",
+    resave: false,
+    saveUninitialized: true
+}));
 server_1.app.use((0, morgan_1.default)("dev"));
 // app.use(cors({ credentials: true, origin: "*" }));
 // app.use(requestHeaders)

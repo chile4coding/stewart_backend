@@ -26,7 +26,7 @@ exports.getMessages = (0, express_async_handler_1.default)((req, res, next) => _
         const inbox = yield prisma_client_1.default.inbox.findMany({
             where: { user_id: authId },
         });
-        res.send(http_status_codes_1.StatusCodes.OK).json({
+        res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Messages successfullly fetched",
             inbox,
         });
@@ -41,7 +41,7 @@ exports.getNotifications = (0, express_async_handler_1.default)((req, res, next)
         const inbox = yield prisma_client_1.default.notifications.findMany({
             where: { user_id: authId },
         });
-        res.send(http_status_codes_1.StatusCodes.OK).json({
+        res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Notifications successfullly fetched",
             inbox,
         });
@@ -61,6 +61,7 @@ exports.deleteMessage = (0, express_async_handler_1.default)((req, res, next) =>
         if (!message) {
             (0, helpers_1.throwError)("Error deleting message", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
+        server_1.socket.emit("new-message");
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Message deleted successfully",
         });
@@ -96,25 +97,30 @@ exports.sendMessage = (0, express_async_handler_1.default)((req, res, next) => _
         if (!admin) {
             (0, helpers_1.throwError)("Unauthorized Admin", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const customers = yield prisma_client_1.default.user.findMany({});
-        customers.forEach((user) => __awaiter(void 0, void 0, void 0, function* () {
-            yield prisma_client_1.default.inbox.create({
-                data: {
-                    title,
-                    message,
-                    user: { connect: { id: user === null || user === void 0 ? void 0 : user.id } },
-                    date: `${new Date().toLocaleDateString("en-UK")}`,
-                },
+        const customers = yield prisma_client_1.default.user.findMany();
+        function createMessage(title, message, id) {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield prisma_client_1.default.inbox.create({
+                    data: {
+                        title,
+                        message,
+                        user: { connect: { id: id } },
+                        date: `${new Date().toLocaleDateString("en-UK")}`,
+                    },
+                });
+                yield prisma_client_1.default.notifications.create({
+                    data: {
+                        notification: "New message received",
+                        link: "/message",
+                        user: { connect: { id: id } },
+                        date: `${new Date().getTime()}`,
+                    },
+                });
             });
-            yield prisma_client_1.default.notifications.create({
-                data: {
-                    notification: "New message received",
-                    link: "/message",
-                    user: { connect: { id: user === null || user === void 0 ? void 0 : user.id } },
-                    date: new Date().getTime(),
-                },
-            });
-        }));
+        }
+        for (const user of customers) {
+            createMessage(title, message, user.id);
+        }
         server_1.socket.emit("new-message");
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Message sent",
@@ -131,7 +137,7 @@ exports.adminMessage = (0, express_async_handler_1.default)((req, res, next) => 
         if (!admin) {
             (0, helpers_1.throwError)("Unauthorized Admin", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const messages = yield prisma_client_1.default.inbox.findMany({});
+        const messages = yield prisma_client_1.default.inbox.findMany();
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Message  fetched successfully",
             messages,

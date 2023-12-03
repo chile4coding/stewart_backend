@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.payOrderWithWallet = exports.getUserOrder = exports.getAllOrder = exports.getOrder = exports.registeredUserCreateOrder = exports.visitorCreateOrder = void 0;
+exports.getAdminReviews = exports.getAdminOrder = exports.payOrderWithWallet = exports.getUserOrder = exports.getAllOrder = exports.getOrder = exports.registeredUserCreateOrder = exports.visitorCreateOrder = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -498,6 +498,44 @@ exports.payOrderWithWallet = (0, express_async_handler_1.default)((req, res, nex
     }
     catch (error) {
         3;
+        next(error);
+    }
+}));
+exports.getAdminOrder = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authId } = req;
+    try {
+        const admin = yield prisma_client_1.default.admin.findUnique({
+            where: { id: authId },
+        });
+        if (!admin) {
+            (0, helpers_1.throwError)("Unauthorized admin", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const orders = yield prisma_client_1.default.order.findMany();
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "orders fetched successfully",
+            orders,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.getAdminReviews = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authId } = req;
+    try {
+        const admin = yield prisma_client_1.default.admin.findUnique({
+            where: { id: authId },
+        });
+        if (!admin) {
+            (0, helpers_1.throwError)("Unauthorized admin", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const reviews = yield prisma_client_1.default.review.findMany();
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "reviews fetched successfully",
+            reviews,
+        });
+    }
+    catch (error) {
         next(error);
     }
 }));

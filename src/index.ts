@@ -12,6 +12,7 @@ import errorHandler from "./middleware/errorhandler";
 import cors from "cors";
 import router from "./route/route";
 import { SocketServer, expressServer } from "./server/server";
+import session from "express-session"
 
 dotenv.config();
 
@@ -23,6 +24,11 @@ app.use(
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({
+  secret: "stewartsecrekey",
+  resave: false,
+  saveUninitialized: true
+}))
 
 app.use(morgan("dev"));
 

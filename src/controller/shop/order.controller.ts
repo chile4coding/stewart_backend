@@ -624,12 +624,18 @@ export const getAdminReviews = expressAsyncHandler(async (req: any, res, next) =
   try {
     const admin = await prisma.admin.findUnique({
       where: { id: authId },
+      
+      
     });
 
     if (!admin) {
       throwError("Unauthorized admin", StatusCodes.BAD_REQUEST, true);
     }
-    const reviews = await prisma.review.findMany();
+    const reviews = await prisma.review.findMany({
+      include:{
+        user:true
+      }
+    });
     res.status(StatusCodes.OK).json({
       message: "reviews fetched successfully",
       reviews,

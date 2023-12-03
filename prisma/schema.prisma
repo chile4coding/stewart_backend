@@ -189,3 +189,8 @@ model Notifications{
 
     
 }
+
+model  Visitor{
+    id String @id @default(uuid())
+    isvistor Boolean?
+}

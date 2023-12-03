@@ -23,7 +23,7 @@ exports.getSavedItems = (0, express_async_handler_1.default)((req, res, next) =>
         const savedItems = yield prisma_client_1.default.saveItem.findMany({
             where: { user_id: authId },
         });
-        res.send(http_status_codes_1.StatusCodes.OK).json({
+        res.status(http_status_codes_1.StatusCodes.OK).json({
             savedItems,
         });
     }
@@ -52,7 +52,7 @@ exports.deleteSavedItem = (0, express_async_handler_1.default)((req, res, next) 
 }));
 exports.saveItem = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     function convertFalseToBoolean(value) {
-        if (typeof value === "string" && value === "false") {
+        if (typeof value === "string" && value === "false" || value === "undefined" || value === undefined) {
             return false;
         }
         else {
@@ -66,7 +66,7 @@ exports.saveItem = (0, express_async_handler_1.default)((req, res, next) => __aw
             const savedItem = yield prisma_client_1.default.saveItem.deleteMany({
                 where: { item_id: id, user_id: authId },
             });
-            res.send(http_status_codes_1.StatusCodes.OK).json({
+            res.status(http_status_codes_1.StatusCodes.OK).json({
                 savedItem,
             });
         }
@@ -78,10 +78,10 @@ exports.saveItem = (0, express_async_handler_1.default)((req, res, next) => __aw
                     amount: amount,
                     status: convertFalseToBoolean(status),
                     user: { connect: { id: authId } },
-                    item_id: id
+                    item_id: id,
                 },
             });
-            res.send(http_status_codes_1.StatusCodes.OK).json({
+            res.status(http_status_codes_1.StatusCodes.OK).json({
                 saved,
             });
         }

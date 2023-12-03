@@ -247,6 +247,14 @@ exports.createOrUpdateClothColor = (0, express_async_handler_1.default)((req, re
 }));
 exports.getCategory = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!req.session.visited) {
+            yield prisma_client_1.default.visitor.create({
+                data: {
+                    isvistor: true
+                }
+            });
+            req.session.visited = true;
+        }
         const category = yield prisma_client_1.default.category.findMany({
             include: {
                 product: {

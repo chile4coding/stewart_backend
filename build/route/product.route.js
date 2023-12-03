@@ -22,4 +22,5 @@ router.post("/get_all_order", auth_1.default, order_controller_1.getAllOrder);
 router.post("/get_user_order", auth_1.default, order_controller_1.getUserOrder);
 router.post("/create_order_user", auth_1.default, order_controller_1.registeredUserCreateOrder);
 router.post("/update_review", auth_1.default, reviews_1.updateReview);
+// ?addmin get items
 exports.productRoute = router;

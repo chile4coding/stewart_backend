@@ -274,8 +274,18 @@ export const createOrUpdateClothColor = expressAsyncHandler(
   }
 );
 
-export const getCategory = expressAsyncHandler(async (req, res, next) => {
+export const getCategory = expressAsyncHandler(async (req:any, res, next) => {
   try {
+
+    if(!req.session.visited){
+      await prisma.visitor.create({
+        data:{
+          isvistor:true
+        }
+      })
+      req.session.visited  =  true
+
+    }
     const category = await prisma.category.findMany({
       include: {
         product: {

@@ -529,7 +529,11 @@ exports.getAdminReviews = (0, express_async_handler_1.default)((req, res, next) 
         if (!admin) {
             (0, helpers_1.throwError)("Unauthorized admin", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const reviews = yield prisma_client_1.default.review.findMany();
+        const reviews = yield prisma_client_1.default.review.findMany({
+            include: {
+                user: true
+            }
+        });
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "reviews fetched successfully",
             reviews,

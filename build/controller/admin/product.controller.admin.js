@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeAProductColor = exports.removeAProduct = exports.getColors = exports.getSizes = exports.getProduct = exports.getCategory = exports.createOrUpdateClothColor = exports.createOrUpdateSize = exports.createOrUpdateProduct = exports.createCategory = void 0;
+exports.deletekVisitor = exports.checkVisitor = exports.removeAProductColor = exports.removeAProduct = exports.getColors = exports.getSizes = exports.getProduct = exports.getCategory = exports.createOrUpdateClothColor = exports.createOrUpdateSize = exports.createOrUpdateProduct = exports.createCategory = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const express_validator_1 = require("express-validator");
 const helpers_1 = require("../../helpers");
@@ -247,14 +247,6 @@ exports.createOrUpdateClothColor = (0, express_async_handler_1.default)((req, re
 }));
 exports.getCategory = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.session.visited) {
-            yield prisma_client_1.default.visitor.create({
-                data: {
-                    isvistor: true
-                }
-            });
-            req.session.visited = true;
-        }
         const category = yield prisma_client_1.default.category.findMany({
             include: {
                 product: {
@@ -282,8 +274,8 @@ exports.getProduct = (0, express_async_handler_1.default)((req, res, next) => __
             include: {
                 reviews: {
                     include: {
-                        user: true
-                    }
+                        user: true,
+                    },
                 },
                 size: {
                     include: {
@@ -376,5 +368,33 @@ exports.removeAProductColor = (0, express_async_handler_1.default)((req, res, ne
     }
     catch (err) {
         next(err);
+    }
+}));
+exports.checkVisitor = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const visitor = yield prisma_client_1.default.visitor.update({
+            where: { id: "5f833504-dd48-492c-b17f-54770c3980fc" },
+            data: {
+                count: { increment: 1 }
+            }
+        });
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "visitor counted",
+            visitor
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.deletekVisitor = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield prisma_client_1.default.visitor.deleteMany();
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "vdeleted",
+        });
+    }
+    catch (error) {
+        next(error);
     }
 }));

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginAdmin = exports.createAdmin = void 0;
+exports.getVistors = exports.adminGetAllUsers = exports.loginAdmin = exports.createAdmin = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
 const validation_result_1 = require("express-validator/src/validation-result");
@@ -73,6 +73,44 @@ exports.loginAdmin = (0, express_async_handler_1.default)((req, res, next) => __
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Welcome to Stewart Collections",
             token,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.adminGetAllUsers = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authId } = req;
+    try {
+        const admin = yield prisma_client_1.default.admin.findUnique({
+            where: { id: authId },
+        });
+        if (!admin) {
+            (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const users = yield prisma_client_1.default.user.findMany();
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "users fetched successfully",
+            users,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.getVistors = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authId } = req;
+    try {
+        const admin = yield prisma_client_1.default.admin.findUnique({
+            where: { id: authId },
+        });
+        if (!admin) {
+            (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const visitors = yield prisma_client_1.default.visitor.findMany();
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "visitor fetched successfully",
+            visitors,
         });
     }
     catch (error) {

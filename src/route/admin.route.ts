@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
+  checkVisitor,
   createCategory,
   createOrUpdateClothColor,
   createOrUpdateProduct,
   createOrUpdateSize,
+  deletekVisitor,
   removeAProduct,
   removeAProductColor,
 } from "../controller/admin/product.controller.admin";
@@ -100,5 +102,7 @@ router.get("/admin_get_orders",auth, getAdminOrder )
 router.get("/admin_get_reviews",auth, getAdminReviews )
 router.get("/get_customers", auth, adminGetAllUsers);
 router.get("/get_visitors", auth, getVistors);
+router.delete("/delete_visitors",  deletekVisitor);
+router.post("/visitor", checkVisitor);
 
 export const adminRoute = router;

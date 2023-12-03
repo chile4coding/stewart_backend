@@ -33,7 +33,7 @@ server_1.app.use(body_parser_1.default.urlencoded({ extended: false }));
 server_1.app.use((0, express_session_1.default)({
     secret: "stewartsecrekey",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false
 }));
 server_1.app.use((0, morgan_1.default)("dev"));
 // app.use(cors({ credentials: true, origin: "*" }));

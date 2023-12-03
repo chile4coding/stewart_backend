@@ -403,13 +403,26 @@ export const removeAProductColor = expressAsyncHandler(
 );
 export const checkVisitor = expressAsyncHandler(async (req, res, next) => {
   try {
-    await prisma.visitor.create({
-      data: {
-        isvistor: true,
-      },
+    const visitor = await prisma.visitor.update({
+      where: { id: "5f833504-dd48-492c-b17f-54770c3980fc" },
+      data:{
+        count: {increment: 1}
+      }
     });
     res.status(StatusCodes.OK).json({
       message: "visitor counted",
+      visitor
+
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+export const deletekVisitor = expressAsyncHandler(async (req, res, next) => {
+  try {
+    await prisma.visitor.deleteMany()
+    res.status(StatusCodes.OK).json({
+      message: "vdeleted",
     });
   } catch (error) {
     next(error);

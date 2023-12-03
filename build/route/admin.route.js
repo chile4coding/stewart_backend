@@ -29,4 +29,8 @@ router.get("/get_notification", auth_1.default, message_controller_1.getNotifica
 router.get("/admin_get_message", auth_1.default, message_controller_1.adminMessage);
 router.get("/admin_get_orders", auth_1.default, order_controller_1.getAdminOrder);
 router.get("/admin_get_reviews", auth_1.default, order_controller_1.getAdminReviews);
+router.get("/get_customers", auth_1.default, admin_controller_1.adminGetAllUsers);
+router.get("/get_visitors", auth_1.default, admin_controller_1.getVistors);
+router.delete("/delete_visitors", product_controller_admin_1.deletekVisitor);
+router.post("/visitor", product_controller_admin_1.checkVisitor);
 exports.adminRoute = router;

@@ -9,6 +9,7 @@ import {
   requestOtp,
   resetPassword,
   updateProfile,
+  uploadUserProfilePics,
   verifyOtp,
 } from "../controller/users/user.controller";
 import { body } from "express-validator";
@@ -93,6 +94,11 @@ router.post(
 
   ],
  updateProfile
+);
+router.post(
+  "/update_user_pics",
+  auth,
+ uploadUserProfilePics
 );
 router.get("/get_user", auth, getUser);
 router.get("/get_saved_items", auth, getSavedItems);

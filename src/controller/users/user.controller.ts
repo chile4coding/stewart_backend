@@ -169,7 +169,7 @@ export const requestOtp = expressAsyncHandler(async (req, res, next) => {
       throwError("user not found", StatusCodes.BAD_REQUEST, true);
     }
 
-     const content = `<body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    const content = `<body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
     <header
       style="
         text-align: center;
@@ -197,7 +197,6 @@ export const requestOtp = expressAsyncHandler(async (req, res, next) => {
 
       `;
 
-    
     const subject = "Stewart Collections OTP Request";
 
     await sendEmail(content, findUser?.email as string, subject);
@@ -404,7 +403,32 @@ export const getUser = expressAsyncHandler(
   }
 );
 
+export const uploadUserProfilePics = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
 
+    const { avatar } = req.body;
+
+    try {
+      const user = await prisma.user.update({
+        where: { id: authId },
+        data: {
+          avatar: avatar,
+        },
+      });
+
+      if (!user) {
+        throwError("Server error", StatusCodes.GATEWAY_TIMEOUT, true);
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: "Profile updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 cron.schedule(" 1 * *  * * * ", async () => {
   console.log("hello this is nice");

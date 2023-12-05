@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVistors = exports.adminGetAllUsers = exports.loginAdmin = exports.createAdmin = void 0;
+exports.adminGraph = exports.getVistors = exports.adminGetAllUsers = exports.loginAdmin = exports.createAdmin = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
 const validation_result_1 = require("express-validator/src/validation-result");
@@ -73,6 +73,7 @@ exports.loginAdmin = (0, express_async_handler_1.default)((req, res, next) => __
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Welcome to Stewart Collections",
             token,
+            findAdmin,
         });
     }
     catch (error) {
@@ -111,6 +112,109 @@ exports.getVistors = (0, express_async_handler_1.default)((req, res, next) => __
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "visitor fetched successfully",
             visitors,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.adminGraph = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authId } = req;
+    try {
+        const admin = yield prisma_client_1.default.admin.findUnique({ where: { id: authId } });
+        if (!admin) {
+            (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
+        }
+        const orders = yield prisma_client_1.default.order.findMany();
+        const Jan = orders.filter((order) => new Date(order.placedOn).getMonth() === 0 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Feb = orders.filter((order) => new Date(order.placedOn).getMonth() === 1 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const March = orders.filter((order) => new Date(order.placedOn).getMonth() === 2 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const April = orders.filter((order) => new Date(order.placedOn).getMonth() === 3 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const May = orders.filter((order) => new Date(order.placedOn).getMonth() === 4 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const June = orders.filter((order) => new Date(order.placedOn).getMonth() === 5 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Jul = orders.filter((order) => new Date(order.placedOn).getMonth() === 6 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Aug = orders.filter((order) => new Date(order.placedOn).getMonth() === 7 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Sep = orders.filter((order) => new Date(order.placedOn).getMonth() === 8 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Oct = orders.filter((order) => new Date(order.placedOn).getMonth() === 9 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Nov = orders.filter((order) => new Date(order.placedOn).getMonth() === 10 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const Dec = orders.filter((order) => new Date(order.placedOn).getMonth() === 11 &&
+            new Date(order.placedOn).getFullYear() === new Date().getFullYear());
+        const userData1 = [
+            {
+                id: 1,
+                month: "Jan",
+                orders: Jan.length,
+            },
+            {
+                id: 2,
+                month: "Feb",
+                orders: Feb.length,
+            },
+            {
+                id: 3,
+                month: "Mar",
+                orders: March.length,
+            },
+            {
+                id: 4,
+                month: "Apr",
+                orders: April.length,
+            },
+            {
+                id: 5,
+                month: "May",
+                orders: May.length,
+            },
+            {
+                id: 6,
+                month: "Jun",
+                orders: June.length,
+            },
+            {
+                id: 7,
+                month: "Jul",
+                orders: Jul.length,
+            },
+            {
+                id: 8,
+                month: "Aug",
+                orders: Aug.length,
+            },
+            {
+                id: 9,
+                month: "Sep",
+                orders: Sep.length,
+            },
+            {
+                id: 10,
+                month: "Oct",
+                orders: Oct.length,
+            },
+            {
+                id: 6,
+                month: "Nov",
+                orders: Nov.length,
+            },
+            {
+                id: 6,
+                month: "Dec",
+                orders: Dec.length,
+            },
+        ];
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            message: "orders graph fetched successfully",
+            userData1,
         });
     }
     catch (error) {

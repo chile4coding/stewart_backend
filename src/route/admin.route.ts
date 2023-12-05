@@ -9,7 +9,7 @@ import {
   removeAProduct,
   removeAProductColor,
 } from "../controller/admin/product.controller.admin";
-import { adminGetAllUsers, createAdmin, getVistors, loginAdmin } from "../controller/admin/admin.controller";
+import { adminGetAllUsers, adminGraph, createAdmin, getVistors, loginAdmin } from "../controller/admin/admin.controller";
 
 import { param, body, check } from "express-validator";
 
@@ -104,5 +104,6 @@ router.get("/get_customers", auth, adminGetAllUsers);
 router.get("/get_visitors", auth, getVistors);
 router.delete("/delete_visitors",  deletekVisitor);
 router.post("/visitor", checkVisitor);
+router.get("/admin_graph",auth, adminGraph);
 
 export const adminRoute = router;

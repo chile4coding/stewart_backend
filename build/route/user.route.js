@@ -47,6 +47,7 @@ router.post("/update_user_profile", auth_1.default, [
     (0, express_validator_1.body)("country").notEmpty(),
     (0, express_validator_1.body)("phone").notEmpty(),
 ], user_controller_1.updateProfile);
+router.post("/update_user_pics", auth_1.default, user_controller_1.uploadUserProfilePics);
 router.get("/get_user", auth_1.default, user_controller_1.getUser);
 router.get("/get_saved_items", auth_1.default, savedItems_controller_1.getSavedItems);
 router.delete("/delete_saved_item", auth_1.default, savedItems_controller_1.deleteSavedItem);

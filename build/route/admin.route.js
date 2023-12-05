@@ -33,4 +33,5 @@ router.get("/get_customers", auth_1.default, admin_controller_1.adminGetAllUsers
 router.get("/get_visitors", auth_1.default, admin_controller_1.getVistors);
 router.delete("/delete_visitors", product_controller_admin_1.deletekVisitor);
 router.post("/visitor", product_controller_admin_1.checkVisitor);
+router.get("/admin_graph", auth_1.default, admin_controller_1.adminGraph);
 exports.adminRoute = router;

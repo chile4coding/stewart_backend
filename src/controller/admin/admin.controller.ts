@@ -79,6 +79,7 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
     res.status(StatusCodes.OK).json({
       message: "Welcome to Stewart Collections",
       token,
+      findAdmin
     });
   } catch (error) {
     next(error);

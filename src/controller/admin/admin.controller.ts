@@ -8,6 +8,7 @@ import {
   hashPassword,
   throwError,
 } from "../../helpers";
+import { error } from "console";
 
 export const createAdmin = expressAsyncHandler(async (req, res, next) => {
   const errors = validationResult(req.body);
@@ -272,6 +273,118 @@ export const adminGraph = expressAsyncHandler(async (req: any, res, next) => {
       userData1,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
+
+export const updateAdminProfile = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+    const errors = validationResult(req.body);
+    if (!errors.isEmpty()) {
+      throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
+    }
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
+
+      if (!admin) {
+        throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+      }
+      const {
+        firstName,
+        lastName,
+        city,
+        country,
+        state,
+        password,
+        email,
+        phone,
+      } = req.body;
+
+          await comparePassword(password, admin?.password as string);
+
+      const updateAdmin = await prisma.admin.update({
+        where: { id: authId },
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          name: city,
+          country,
+          state,
+          password,
+          email,
+          phone_number: phone,
+        },
+      });
+
+      if (!updateAdmin) {
+        throwError("Server Error", StatusCodes.BAD_REQUEST, true);
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: "Profile updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+export const updateAdminProfilePics = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+    const errors = validationResult(req.body);
+    if (!errors.isEmpty()) {
+      throwError("Invalid inputs", StatusCodes.BAD_REQUEST, true);
+    }
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
+
+      if (!admin) {
+        throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+      }
+      const { avatar } = req.body;
+
+      const updateAdmin = await prisma.admin.update({
+        where: { id: authId },
+        data: {
+          avatar_url: avatar,
+        },
+      });
+
+      if (!updateAdmin) {
+        throwError("Server Error", StatusCodes.BAD_REQUEST, true);
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: "Profile updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+export const getAdminProfile = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
+
+      if (!admin) {
+        throwError("Invalid admin user", StatusCodes.BAD_REQUEST, true);
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: "Admin user fetched succcessully",
+        admin,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);

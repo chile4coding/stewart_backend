@@ -176,7 +176,6 @@ state String?
 email String @unique
 avatar_url String?
 
-
 }
 
 model Notifications{

@@ -9,13 +9,32 @@ import {
   removeAProduct,
   removeAProductColor,
 } from "../controller/admin/product.controller.admin";
-import { adminGetAllUsers, adminGraph, createAdmin, getVistors, loginAdmin } from "../controller/admin/admin.controller";
+import {
+  adminGetAllUsers,
+  adminGraph,
+  createAdmin,
+  getAdminProfile,
+  getVistors,
+  loginAdmin,
+  updateAdminProfile,
+  updateAdminProfilePics,
+} from "../controller/admin/admin.controller";
 
 import { param, body, check } from "express-validator";
 
 import auth from "../middleware/auth";
-import { adminMessage, deleteMessage, deleteNotification, getMessages, getNotifications, sendMessage } from "../controller/shop/message.controller";
-import { getAdminOrder, getAdminReviews } from "../controller/shop/order.controller";
+import {
+  adminMessage,
+  deleteMessage,
+  deleteNotification,
+  getMessages,
+  getNotifications,
+  sendMessage,
+} from "../controller/shop/message.controller";
+import {
+  getAdminOrder,
+  getAdminReviews,
+} from "../controller/shop/order.controller";
 const router = Router();
 
 router.post(
@@ -67,43 +86,42 @@ router.post(
 
   createOrUpdateClothColor
 );
-router.post(
-  "/create_message",
-  auth,
-  sendMessage
-);
-router.get(
-  "/get_messages",
-  auth,
-  getMessages
-);
-router.delete(
-  "/messages",
-  auth,
-  deleteMessage
-);
-router.delete(
-  "/notification",
-  auth,
-  deleteNotification
-);
-router.get(
-  "/get_notification",
-  auth,
- getNotifications
-);
-router.get(
-  "/admin_get_message",
-  auth,
- adminMessage
-);
+router.post("/create_message", auth, sendMessage);
+router.get("/get_messages", auth, getMessages);
+router.delete("/messages", auth, deleteMessage);
+router.delete("/notification", auth, deleteNotification);
+router.get("/get_notification", auth, getNotifications);
+router.get("/admin_get_message", auth, adminMessage);
 
-router.get("/admin_get_orders",auth, getAdminOrder )
-router.get("/admin_get_reviews",auth, getAdminReviews )
+router.get("/admin_get_orders", auth, getAdminOrder);
+router.get("/admin_get_reviews", auth, getAdminReviews);
 router.get("/get_customers", auth, adminGetAllUsers);
 router.get("/get_visitors", auth, getVistors);
-router.delete("/delete_visitors",  deletekVisitor);
+router.delete("/delete_visitors", deletekVisitor);
 router.post("/visitor", checkVisitor);
-router.get("/admin_graph",auth, adminGraph);
+router.get("/admin_graph", auth, adminGraph);
+
+router.post(
+  "/update_admin_profile",
+  [
+    check("email").isEmail().isEmpty(),
+    check("password").isEmpty(),
+    check("firstName").isEmpty(),
+    check("lastName").isEmpty(),
+    check("city").isEmpty(),
+    check("country").isEmpty(),
+    check("state").isEmpty(),
+    check("phone").isEmpty(),
+  ],
+  auth,
+  updateAdminProfile
+);
+router.post(
+  "/update_admin_profile_pics",
+  [check("avatar").isEmpty()],
+  auth,
+  updateAdminProfilePics
+);
+router.get("/get_admin", auth, getAdminProfile);
 
 export const adminRoute = router;

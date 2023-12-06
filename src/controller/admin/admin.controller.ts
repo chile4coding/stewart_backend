@@ -71,6 +71,13 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
         true
       );
     }
+
+    const findAdminUpdate = await prisma.admin.update({
+      where: { id: findAdmin?.id as string },
+      data: {
+        last_login: `${new Date().toLocaleDateString("en-UK")} ${new Date().toLocaleTimeString("en-UK")}`,
+      },
+    }); 
     await comparePassword(password, findAdmin?.password as string);
     const token = JWTToken(
       findAdmin?.email as string,
@@ -80,7 +87,7 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
     res.status(StatusCodes.OK).json({
       message: "Welcome to Stewart Collections",
       token,
-      findAdmin,
+      findAdminUpdate,
     });
   } catch (error) {
     next(error);

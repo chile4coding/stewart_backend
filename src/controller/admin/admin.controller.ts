@@ -303,7 +303,6 @@ export const updateAdminProfile = expressAsyncHandler(
         phone,
       } = req.body;
 
-          await comparePassword(password, admin?.password as string);
 
       const updateAdmin = await prisma.admin.update({
         where: { id: authId },

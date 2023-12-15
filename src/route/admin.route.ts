@@ -124,6 +124,6 @@ router.post(
   updateAdminProfilePics
 );
 router.get("/get_admin", auth, getAdminProfile);
-router.post("/contact", auth, contactUsMessage);
+router.post("/contact",  contactUsMessage);
 
 export const adminRoute = router;

@@ -6,8 +6,11 @@ import {
   JWTToken,
   comparePassword,
   hashPassword,
+  sendEmail,
   throwError,
 } from "../../helpers";
+import dotenv from "dotenv"
+dotenv.config()
 import { error } from "console";
 
 export const createAdmin = expressAsyncHandler(async (req, res, next) => {
@@ -75,9 +78,11 @@ export const loginAdmin = expressAsyncHandler(async (req, res, next) => {
     const findAdminUpdate = await prisma.admin.update({
       where: { id: findAdmin?.id as string },
       data: {
-        last_login: `${new Date().toLocaleDateString("en-UK")} ${new Date().toLocaleTimeString("en-UK")}`,
+        last_login: `${new Date().toLocaleDateString(
+          "en-UK"
+        )} ${new Date().toLocaleTimeString("en-UK")}`,
       },
-    }); 
+    });
     await comparePassword(password, findAdmin?.password as string);
     const token = JWTToken(
       findAdmin?.email as string,
@@ -310,7 +315,6 @@ export const updateAdminProfile = expressAsyncHandler(
         phone,
       } = req.body;
 
-
       const updateAdmin = await prisma.admin.update({
         where: { id: authId },
         data: {
@@ -394,3 +398,59 @@ export const getAdminProfile = expressAsyncHandler(
     }
   }
 );
+export const contactUsMessage = expressAsyncHandler(async (req, res, next) => {
+  const { message, email, phone, firstname, lastname } = req.body;
+
+  try {
+    const content = `
+  <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+    <header
+      style="
+        text-align: center;
+        background-color:#d9d9d9;
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        justify-content: center;
+      ">
+      <img
+        src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+        alt="Stewart Collection Logo"
+        style="max-width: 200px; max-width: 60px" />
+      <h1>
+        <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      </h1>
+    </header>
+     
+     <p>${message}</p>
+    <h5>Sender: ${firstname} ${lastname}</h5>
+    <h5>Email: ${email}</h5>
+    <h5>Phone: ${phone}</h5>
+        <footer style="text-align: center; margin-top: 20px">
+      <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+    </footer>
+  </body>
+
+      `;
+          const subject = "You have message from a customer";
+
+              await sendEmail(content, process.env.EMAIL as string, subject);
+
+
+    await prisma.contactus.create({
+      data: {
+        message,
+        email,
+        phone,
+        firstname,
+        lastname,
+      },
+    });
+
+    res.status(StatusCodes.OK).json({
+      message: "message sent succcessully",
+    });
+  } catch (error) {
+    next(error);
+  }
+});

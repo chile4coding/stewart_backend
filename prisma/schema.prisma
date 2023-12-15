@@ -194,3 +194,12 @@ model  Visitor{
     isvistor Boolean?
     count Int
 }
+
+model Contactus{
+   id String @id @default(uuid())
+email String
+phone String?
+firstname String
+lastname String
+message String
+}

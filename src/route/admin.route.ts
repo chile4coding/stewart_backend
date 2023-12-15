@@ -12,6 +12,7 @@ import {
 import {
   adminGetAllUsers,
   adminGraph,
+  contactUsMessage,
   createAdmin,
   getAdminProfile,
   getVistors,
@@ -123,5 +124,6 @@ router.post(
   updateAdminProfilePics
 );
 router.get("/get_admin", auth, getAdminProfile);
+router.post("/contact", auth, contactUsMessage);
 
 export const adminRoute = router;

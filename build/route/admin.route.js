@@ -34,4 +34,17 @@ router.get("/get_visitors", auth_1.default, admin_controller_1.getVistors);
 router.delete("/delete_visitors", product_controller_admin_1.deletekVisitor);
 router.post("/visitor", product_controller_admin_1.checkVisitor);
 router.get("/admin_graph", auth_1.default, admin_controller_1.adminGraph);
+router.post("/update_admin_profile", [
+    (0, express_validator_1.check)("email").isEmail().isEmpty(),
+    (0, express_validator_1.check)("password").isEmpty(),
+    (0, express_validator_1.check)("firstName").isEmpty(),
+    (0, express_validator_1.check)("lastName").isEmpty(),
+    (0, express_validator_1.check)("city").isEmpty(),
+    (0, express_validator_1.check)("country").isEmpty(),
+    (0, express_validator_1.check)("state").isEmpty(),
+    (0, express_validator_1.check)("phone").isEmpty(),
+], auth_1.default, admin_controller_1.updateAdminProfile);
+router.post("/update_admin_profile_pics", [(0, express_validator_1.check)("avatar").isEmpty()], auth_1.default, admin_controller_1.updateAdminProfilePics);
+router.get("/get_admin", auth_1.default, admin_controller_1.getAdminProfile);
+router.post("/contact", admin_controller_1.contactUsMessage);
 exports.adminRoute = router;

@@ -15,7 +15,7 @@ exports.default = (req, res, next) => {
             (0, helpers_1.throwError)("No token provided", http_status_codes_1.StatusCodes.UNAUTHORIZED);
         }
         let decode;
-        const token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.split(" ")[1];
+        const token = authHeader?.split(" ")[1];
         decode = jsonwebtoken_1.default.verify(token, `${process.env.JWT_SECRET_KEY}`);
         if (!token || !decode) {
             (0, helpers_1.throwError)("Invalid token", http_status_codes_1.StatusCodes.UNAUTHORIZED);

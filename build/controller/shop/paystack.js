@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -22,24 +13,23 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
 const Paystack = (0, paystack_1.default)(process.env.paystackAuthization + "");
 dotenv_1.default.config();
-exports.verifyPayment = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+exports.verifyPayment = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { reference } = req.query;
     try {
         if (!Boolean(reference)) {
             (0, helpers_1.throwError)("Invalid Input", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const verifyPay = yield ((_a = Paystack === null || Paystack === void 0 ? void 0 : Paystack.transaction) === null || _a === void 0 ? void 0 : _a.verify(reference));
-        if ((verifyPay === null || verifyPay === void 0 ? void 0 : verifyPay.data.status) === "success") {
+        const verifyPay = await Paystack?.transaction?.verify(reference);
+        if (verifyPay?.data.status === "success") {
             const amount = Number(verifyPay.data.amount);
             const amountN = Number((amount / 100).toFixed(2));
-            const walletAmount = yield prisma_client_1.default.wallet.findUnique({
+            const walletAmount = await prisma_client_1.default.wallet.findUnique({
                 where: { transactionref: reference },
             });
-            const oldAmount = Number(walletAmount === null || walletAmount === void 0 ? void 0 : walletAmount.amount);
+            const oldAmount = Number(walletAmount?.amount);
             const currentAmount = oldAmount + amountN;
-            yield prisma_client_1.default.wallet.update({
-                where: { id: walletAmount === null || walletAmount === void 0 ? void 0 : walletAmount.id },
+            await prisma_client_1.default.wallet.update({
+                where: { id: walletAmount?.id },
                 data: {
                     amount: currentAmount,
                 },
@@ -53,9 +43,8 @@ exports.verifyPayment = (0, express_async_handler_1.default)((req, res, next) =>
     catch (error) {
         next(error);
     }
-}));
-exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+});
+exports.fundWallet = (0, express_async_handler_1.default)(async (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid input valid  ", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
@@ -69,7 +58,7 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
         return referenceNumber;
     }
     try {
-        const initPayment = yield Paystack.transaction.initialize({
+        const initPayment = await Paystack.transaction.initialize({
             name: name,
             amount: Number(amount) * 100,
             email: email,
@@ -77,10 +66,10 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
             callback_url: "https://stewart-r0co.onrender.com/api/v1/verify_payment",
             authorization: `Bearer ${process.env.paystackAuthization}`,
         });
-        yield prisma_client_1.default.wallet.update({
+        await prisma_client_1.default.wallet.update({
             where: { user_id: authId },
             data: {
-                transactionref: (_b = initPayment === null || initPayment === void 0 ? void 0 : initPayment.data) === null || _b === void 0 ? void 0 : _b.reference,
+                transactionref: initPayment?.data?.reference,
             },
         });
         res.status(http_status_codes_1.StatusCodes.OK).json({
@@ -90,4 +79,4 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
     catch (error) {
         next(error);
     }
-}));
+});

@@ -42,13 +42,13 @@ class CreateDBConnect {
     try {
       // requiredEnvVars.forEach((envVar) => {
       //   if (!process.env[envVar]) {
-      //     throw new Error(`Missing ${envVar} environment variable`);
+      //     throw new Error(`Missing ${ezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzznvVar} environment variable`);
       //   }
       // });
       await this.db.$connect();
       console.log("Connected to database successfully");
       SocketServer();
-      const server = expressServer.listen(process.env.port, () =>
+      const server = expressServer.listen(process.env.port ||8080, () =>
         console.log(`Server started on port ${process.env.port}`)
       );
     } catch (error: any) {

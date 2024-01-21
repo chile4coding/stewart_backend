@@ -1,0 +1,205 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id String  @id @default(uuid())
+}
+
+model Category{
+ id String @id @default(uuid())
+  name String
+  image String?
+  product Product[]
+}
+
+model Product{
+id String @id @default(uuid())
+name String?
+categoryName String?
+image String?
+price Float?
+sales_price Float?
+discount Float?
+initial_size String?
+subscriber_price Float?
+initial_color String?
+short_desc String?
+description String?
+category_id String 
+category Category @relation(fields: [category_id], references:[id])
+size Size[]
+reviews Review[]
+}
+
+model Size{
+  id  String @id @default(uuid())
+  name String
+  waist String?
+  length String?
+  sleaves String?
+  product Product? @relation(fields: [product_id], references:[id])
+  product_id String?
+colors Color[]
+
+}
+
+model Color{
+  id String @id @default(uuid())
+  name String 
+  image String?
+  sales_price Float?
+  price Float
+  discount Float
+  subscriber_price Float
+size Size? @relation(fields: [size_id], references: [id])
+size_id String?
+
+}
+
+model User{
+  id String @id @default(uuid())
+ 
+name String
+  email String @unique
+  gender String?
+  phone String?
+  otp String?  @unique
+  verify_otp Boolean
+  otp_secret String
+  otp_trial String @unique
+  passwords String
+  dob String
+  city String?
+  state String?
+  country String?
+  address String?
+  avatar String?
+  review Review[]
+  inbox Inbox[]
+  wallet Wallet?
+  orders Order[]
+  is_varified Boolean @default(false)
+save_items SaveItem[]
+notifications Notifications[]
+}
+
+model Review{
+  id String @id @default(uuid())
+  rating String
+  date String 
+  name String
+  is_verified Boolean @default(false)
+  comment String
+  avatar String
+  product Product @relation(fields: [product_id], references: [id])
+  product_id String 
+  user User @relation(fields: [user_id], references: [id])
+  user_id String 
+
+}
+
+model Inbox{
+  id  String @id @default(uuid())
+  date String?
+  message String?
+  title String?
+  user User @relation(fields: [user_id], references: [id])
+  user_id String 
+}
+
+model Wallet{
+  id String @id @default(uuid())
+  amount Float @default(0)
+  user User @relation(fields: [user_id], references: [id])
+  user_id String @unique
+  transactionref String? @unique
+}
+
+model Order {
+  id      String   @id @default(uuid())
+  status  String?
+  placedOn String
+  name String?
+  email String?
+  state String?
+  shippingType ShippingType @default(standard)
+  city String?
+  address String?
+  country String?
+  phone String?
+  refNo String?
+  orderitem Json
+  user    User ?    @relation(fields: [user_id], references: [id])
+  user_id String?  
+  total Float?
+  tax Float?
+  shipping Float?
+  arrivalDate String?
+}
+
+model SaveItem{
+  id String @id @default(uuid())
+  user    User ?    @relation(fields: [user_id], references: [id])
+  user_id String? 
+  item_id String? 
+  image String?
+  name String?
+  amount String
+  status Boolean
+}
+
+
+enum ShippingType{
+standard
+express
+}
+
+
+model Admin{
+  id String @id @default(uuid())
+name String?
+password String
+first_name String?
+last_name String?
+phone_number String?
+country String?
+state String?
+email String @unique
+avatar_url String?
+last_login String ?
+}
+
+model Notifications{
+    id String @id @default(uuid())
+    notification String?
+    link String?
+    user    User ?    @relation(fields: [user_id], references: [id])
+  user_id String?  
+  date String?
+
+    
+}
+
+model  Visitor{
+    id String @id @default(uuid())
+    isvistor Boolean?
+    count Int
+}
+
+model Contactus{
+   id String @id @default(uuid())
+email String
+phone String?
+firstname String
+lastname String
+message String
+}

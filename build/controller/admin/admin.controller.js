@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,14 +20,14 @@ const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-exports.createAdmin = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.createAdmin = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, validation_result_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
     try {
         const { email, password } = req.body;
-        const findAdmin = await prisma_client_1.default.admin.findUnique({
+        const findAdmin = yield prisma_client_1.default.admin.findUnique({
             where: {
                 email,
             },
@@ -26,13 +35,13 @@ exports.createAdmin = (0, express_async_handler_1.default)(async (req, res, next
         if (findAdmin) {
             (0, helpers_1.throwError)("Admin Already registered", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const checkMoreThanOneAdmin = await prisma_client_1.default.admin.findMany();
+        const checkMoreThanOneAdmin = yield prisma_client_1.default.admin.findMany();
         console.log(checkMoreThanOneAdmin);
         if (checkMoreThanOneAdmin.length >= 1) {
             (0, helpers_1.throwError)("Stewart Collect can not allow multiple admin", http_status_codes_1.StatusCodes.BAD_GATEWAY, true);
         }
-        const hashedPassword = await (0, helpers_1.hashPassword)(password);
-        const admin = await prisma_client_1.default.admin.create({
+        const hashedPassword = yield (0, helpers_1.hashPassword)(password);
+        const admin = yield prisma_client_1.default.admin.create({
             data: { email, password: hashedPassword },
         });
         if (!admin) {
@@ -45,15 +54,15 @@ exports.createAdmin = (0, express_async_handler_1.default)(async (req, res, next
     catch (error) {
         next(error);
     }
-});
-exports.loginAdmin = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.loginAdmin = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, validation_result_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
     try {
         const { email, password } = req.body;
-        const findAdmin = await prisma_client_1.default.admin.findUnique({
+        const findAdmin = yield prisma_client_1.default.admin.findUnique({
             where: {
                 email,
             },
@@ -61,14 +70,14 @@ exports.loginAdmin = (0, express_async_handler_1.default)(async (req, res, next)
         if (!findAdmin) {
             (0, helpers_1.throwError)("Admin user not found, wrong email entered", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const findAdminUpdate = await prisma_client_1.default.admin.update({
-            where: { id: findAdmin?.id },
+        const findAdminUpdate = yield prisma_client_1.default.admin.update({
+            where: { id: findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.id },
             data: {
                 last_login: `${new Date().toLocaleDateString("en-UK")} ${new Date().toLocaleTimeString("en-UK")}`,
             },
         });
-        await (0, helpers_1.comparePassword)(password, findAdmin?.password);
-        const token = (0, helpers_1.JWTToken)(findAdmin?.email, findAdmin?.id, findAdmin?.password);
+        yield (0, helpers_1.comparePassword)(password, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.password);
+        const token = (0, helpers_1.JWTToken)(findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.email, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.id, findAdmin === null || findAdmin === void 0 ? void 0 : findAdmin.password);
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "Welcome to Stewart Collections",
             token,
@@ -78,17 +87,17 @@ exports.loginAdmin = (0, express_async_handler_1.default)(async (req, res, next)
     catch (error) {
         next(error);
     }
-});
-exports.adminGetAllUsers = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.adminGetAllUsers = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({
+        const admin = yield prisma_client_1.default.admin.findUnique({
             where: { id: authId },
         });
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const users = await prisma_client_1.default.user.findMany();
+        const users = yield prisma_client_1.default.user.findMany();
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "users fetched successfully",
             users,
@@ -97,17 +106,17 @@ exports.adminGetAllUsers = (0, express_async_handler_1.default)(async (req, res,
     catch (error) {
         next(error);
     }
-});
-exports.getVistors = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.getVistors = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({
+        const admin = yield prisma_client_1.default.admin.findUnique({
             where: { id: authId },
         });
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const visitors = await prisma_client_1.default.visitor.findMany();
+        const visitors = yield prisma_client_1.default.visitor.findMany();
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "visitor fetched successfully",
             visitors,
@@ -116,15 +125,15 @@ exports.getVistors = (0, express_async_handler_1.default)(async (req, res, next)
     catch (error) {
         next(error);
     }
-});
-exports.adminGraph = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.adminGraph = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({ where: { id: authId } });
+        const admin = yield prisma_client_1.default.admin.findUnique({ where: { id: authId } });
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const orders = await prisma_client_1.default.order.findMany();
+        const orders = yield prisma_client_1.default.order.findMany();
         const Jan = orders.filter((order) => new Date(order.placedOn).getMonth() === 0 &&
             new Date(order.placedOn).getFullYear() === new Date().getFullYear());
         const Feb = orders.filter((order) => new Date(order.placedOn).getMonth() === 1 &&
@@ -219,22 +228,22 @@ exports.adminGraph = (0, express_async_handler_1.default)(async (req, res, next)
     catch (error) {
         next(error);
     }
-});
-exports.updateAdminProfile = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.updateAdminProfile = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     const errors = (0, validation_result_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({
+        const admin = yield prisma_client_1.default.admin.findUnique({
             where: { id: authId },
         });
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
         const { firstName, lastName, city, country, state, password, email, phone, } = req.body;
-        const updateAdmin = await prisma_client_1.default.admin.update({
+        const updateAdmin = yield prisma_client_1.default.admin.update({
             where: { id: authId },
             data: {
                 first_name: firstName,
@@ -257,22 +266,22 @@ exports.updateAdminProfile = (0, express_async_handler_1.default)(async (req, re
     catch (error) {
         next(error);
     }
-});
-exports.updateAdminProfilePics = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.updateAdminProfilePics = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     const errors = (0, validation_result_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
     }
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({
+        const admin = yield prisma_client_1.default.admin.findUnique({
             where: { id: authId },
         });
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
         const { avatar } = req.body;
-        const updateAdmin = await prisma_client_1.default.admin.update({
+        const updateAdmin = yield prisma_client_1.default.admin.update({
             where: { id: authId },
             data: {
                 avatar_url: avatar,
@@ -288,11 +297,11 @@ exports.updateAdminProfilePics = (0, express_async_handler_1.default)(async (req
     catch (error) {
         next(error);
     }
-});
-exports.getAdminProfile = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.getAdminProfile = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     try {
-        const admin = await prisma_client_1.default.admin.findUnique({
+        const admin = yield prisma_client_1.default.admin.findUnique({
             where: { id: authId },
         });
         if (!admin) {
@@ -306,8 +315,8 @@ exports.getAdminProfile = (0, express_async_handler_1.default)(async (req, res, 
     catch (error) {
         next(error);
     }
-});
-exports.contactUsMessage = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.contactUsMessage = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { message, email, phone, firstname, lastname } = req.body;
     try {
         const content = `
@@ -341,8 +350,8 @@ exports.contactUsMessage = (0, express_async_handler_1.default)(async (req, res,
 
       `;
         const subject = "You have message from a customer";
-        await (0, helpers_1.sendEmail)(content, process.env.EMAIL, subject);
-        await prisma_client_1.default.contactus.create({
+        yield (0, helpers_1.sendEmail)(content, process.env.EMAIL, subject);
+        yield prisma_client_1.default.contactus.create({
             data: {
                 message,
                 email,
@@ -358,4 +367,4 @@ exports.contactUsMessage = (0, express_async_handler_1.default)(async (req, res,
     catch (error) {
         next(error);
     }
-});
+}));

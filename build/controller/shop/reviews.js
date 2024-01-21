@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,7 +18,7 @@ const express_validator_1 = require("express-validator");
 const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
-exports.addreview = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.addreview = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
         (0, helpers_1.throwError)("Invalid inputs", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
@@ -21,7 +30,7 @@ exports.addreview = (0, express_async_handler_1.default)(async (req, res, next) 
         // check the user and the product Id if they are the same
         // update the review field
         // but if they are not the same then u need to create a new review
-        const review = await prisma_client_1.default.review.findMany({
+        const review = yield prisma_client_1.default.review.findMany({
             where: { product_id: productId },
         });
         let check = false;
@@ -30,7 +39,7 @@ exports.addreview = (0, express_async_handler_1.default)(async (req, res, next) 
                 check = true;
             }
         });
-        const user = await prisma_client_1.default.user.findUnique({
+        const user = yield prisma_client_1.default.user.findUnique({
             where: {
                 id: authId,
             },
@@ -40,16 +49,16 @@ exports.addreview = (0, express_async_handler_1.default)(async (req, res, next) 
         }
         let userReview;
         if (!check) {
-            userReview = await prisma_client_1.default.review.create({
+            userReview = yield prisma_client_1.default.review.create({
                 data: {
                     rating,
                     name: name,
                     comment: comment,
-                    is_verified: Boolean(user?.is_varified),
-                    avatar: user?.avatar || " ",
+                    is_verified: Boolean(user === null || user === void 0 ? void 0 : user.is_varified),
+                    avatar: (user === null || user === void 0 ? void 0 : user.avatar) || " ",
                     date: `${new Date().toLocaleString("en-US")}`,
                     product: { connect: { id: productId } },
-                    user: { connect: { id: user?.id } },
+                    user: { connect: { id: user === null || user === void 0 ? void 0 : user.id } },
                 },
             });
             res.status(http_status_codes_1.StatusCodes.CREATED).json({
@@ -66,11 +75,11 @@ exports.addreview = (0, express_async_handler_1.default)(async (req, res, next) 
     catch (error) {
         next(error);
     }
-});
-exports.getReviews = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.getReviews = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { authId } = req;
     try {
-        const reviews = await prisma_client_1.default.review.findMany({
+        const reviews = yield prisma_client_1.default.review.findMany({
             where: {
                 user_id: authId,
             },
@@ -83,11 +92,11 @@ exports.getReviews = (0, express_async_handler_1.default)(async (req, res, next)
     catch (error) {
         next(error);
     }
-});
-exports.deleteReviews = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.deleteReviews = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.body;
     try {
-        const reviews = await prisma_client_1.default.review.delete({
+        const reviews = yield prisma_client_1.default.review.delete({
             where: {
                 id,
             },
@@ -102,11 +111,11 @@ exports.deleteReviews = (0, express_async_handler_1.default)(async (req, res, ne
     catch (error) {
         next(error);
     }
-});
-exports.updateReview = (0, express_async_handler_1.default)(async (req, res, next) => {
+}));
+exports.updateReview = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { rating, comment, id } = req.body;
     try {
-        const review = await prisma_client_1.default.review.update({
+        const review = yield prisma_client_1.default.review.update({
             where: { id: id },
             data: {
                 rating,
@@ -124,4 +133,4 @@ exports.updateReview = (0, express_async_handler_1.default)(async (req, res, nex
     catch (error) {
         next(error);
     }
-});
+}));

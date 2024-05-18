@@ -9,8 +9,8 @@ import {
   sendEmail,
   throwError,
 } from "../../helpers";
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 import { error } from "console";
 
 export const createAdmin = expressAsyncHandler(async (req, res, next) => {
@@ -307,7 +307,7 @@ export const updateAdminProfile = expressAsyncHandler(
       const {
         firstName,
         lastName,
-        city,
+        name: city,
         country,
         state,
         password,
@@ -432,10 +432,9 @@ export const contactUsMessage = expressAsyncHandler(async (req, res, next) => {
   </body>
 
       `;
-          const subject = "You have message from a customer";
+    const subject = "You have message from a customer";
 
-              await sendEmail(content, process.env.EMAIL as string, subject);
-
+    await sendEmail(content, process.env.EMAIL as string, subject);
 
     await prisma.contactus.create({
       data: {

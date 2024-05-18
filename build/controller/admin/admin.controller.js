@@ -242,7 +242,7 @@ exports.updateAdminProfile = (0, express_async_handler_1.default)((req, res, nex
         if (!admin) {
             (0, helpers_1.throwError)("Invalid admin user", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
         }
-        const { firstName, lastName, city, country, state, password, email, phone, } = req.body;
+        const { firstName, lastName, name: city, country, state, password, email, phone, } = req.body;
         const updateAdmin = yield prisma_client_1.default.admin.update({
             where: { id: authId },
             data: {

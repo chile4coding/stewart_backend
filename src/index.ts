@@ -48,7 +48,7 @@ class CreateDBConnect {
       await this.db.$connect();
       console.log("Connected to database successfully");
       SocketServer();
-      const server = expressServer.listen(process.env.port ||8080, () =>
+      const server = expressServer.listen(process.env.port || 8080, () =>
         console.log(`Server started on port ${process.env.port}`)
       );
     } catch (error: any) {

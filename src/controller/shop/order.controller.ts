@@ -5,7 +5,7 @@ import prisma from "../../configuration/prisma-client";
 import expressAsyncHandler from "express-async-handler";
 import auth from "../../middleware/auth";
 import { validationResult } from "express-validator";
-import userAgent  from "useragent"
+import userAgent from "useragent";
 dotenv.config();
 
 export const visitorCreateOrder = expressAsyncHandler(
@@ -619,28 +619,28 @@ export const getAdminOrder = expressAsyncHandler(
   }
 );
 
-export const getAdminReviews = expressAsyncHandler(async (req: any, res, next) => {
-  const { authId } = req;
-  try {
-    const admin = await prisma.admin.findUnique({
-      where: { id: authId },
-      
-      
-    });
+export const getAdminReviews = expressAsyncHandler(
+  async (req: any, res, next) => {
+    const { authId } = req;
+    try {
+      const admin = await prisma.admin.findUnique({
+        where: { id: authId },
+      });
 
-    if (!admin) {
-      throwError("Unauthorized admin", StatusCodes.BAD_REQUEST, true);
-    }
-    const reviews = await prisma.review.findMany({
-      include:{
-        user:true
+      if (!admin) {
+        throwError("Unauthorized admin", StatusCodes.BAD_REQUEST, true);
       }
-    });
-    res.status(StatusCodes.OK).json({
-      message: "reviews fetched successfully",
-      reviews,
-    });
-  } catch (error) {
-    next(error);
+      const reviews = await prisma.review.findMany({
+        include: {
+          user: true,
+        },
+      });
+      res.status(StatusCodes.OK).json({
+        message: "reviews fetched successfully",
+        reviews,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);

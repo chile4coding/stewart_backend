@@ -28,15 +28,13 @@ export const verifyPayment = expressAsyncHandler(
         });
         const oldAmount = Number(walletAmount?.amount);
         const currentAmount = oldAmount + amountN;
-      await prisma.wallet.update({
+        await prisma.wallet.update({
           where: { id: walletAmount?.id },
           data: {
             amount: currentAmount,
           },
         });
-        res.redirect(
-          "https://stewart-frontend-chile4coding.vercel.app/my_account"
-        );
+        res.redirect("https://www.stewartcollection.store/my_account");
       } else {
         throwError("payment failed", StatusCodes.BAD_REQUEST, true);
       }
@@ -70,7 +68,6 @@ export const fundWallet = expressAsyncHandler(
         authorization: `Bearer ${process.env.paystackAuthization}`,
       });
 
-
       await prisma.wallet.update({
         where: { user_id: authId },
         data: {
@@ -81,8 +78,6 @@ export const fundWallet = expressAsyncHandler(
         data: initPayment.data.authorization_url,
       });
     } catch (error) {
-
-        
       next(error);
     }
   }

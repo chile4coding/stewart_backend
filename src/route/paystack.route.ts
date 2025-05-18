@@ -18,9 +18,6 @@ router.post(
   auth,
   fundWallet
 );
-router.get(
-  "/verify_payment",
-  verifyPayment
-);
+router.get("/verify_payment", verifyPayment);
 
 export const paystackRoute = router;

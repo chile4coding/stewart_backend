@@ -21,6 +21,9 @@ router.post("/get_track_order", order_controller_1.getOrder);
 router.post("/get_all_order", auth_1.default, order_controller_1.getAllOrder);
 router.post("/get_user_order", auth_1.default, order_controller_1.getUserOrder);
 router.post("/create_order_user", auth_1.default, order_controller_1.registeredUserCreateOrder);
+router.post("/create_order_user_with_card", auth_1.default, order_controller_1.createOrderWithCard);
+router.post("/create_order_visitor_with_card", order_controller_1.createOrderWithCard);
 router.post("/update_review", auth_1.default, reviews_1.updateReview);
+router.get("/product/:id", product_controller_admin_1.getSingleProduct);
 // ?addmin get items
 exports.productRoute = router;

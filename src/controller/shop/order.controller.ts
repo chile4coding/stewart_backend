@@ -644,3 +644,176 @@ export const getAdminReviews = expressAsyncHandler(
     }
   }
 );
+
+export const createOrderWithCard = expressAsyncHandler(
+  async (req: Request | any, res, next) => {
+    const {
+      email,
+      total,
+      orderitem,
+      name,
+
+      state,
+      city,
+      address,
+      country,
+      status,
+      shipping,
+      phone,
+      shippingType,
+      refNo,
+    } = req.body;
+    const { authId } = req;
+    const currentDate = new Date();
+    try {
+      await prisma.order.create({
+        data: {
+          email,
+          total,
+          orderitem,
+          name,
+          state,
+          city,
+          address,
+          status,
+          placedOn: `${new Date().toDateString()}`,
+          country,
+          shipping,
+          phone,
+          shippingType,
+          ...(authId ? { user: { connect: { id: authId } } } : {}),
+          refNo,
+          arrivalDate: currentDate + "",
+        },
+      });
+
+      res.status(StatusCodes.OK).json({
+        message: "Order placed successfully",
+      });
+
+      // const arrivalDate =
+      //   shippingType === "express"
+      //     ? currentDate.setDate(currentDate.getDate() + 4)
+      //     : currentDate.setDate(currentDate.getDate() + 7);
+
+      //     const items = orderitem
+      //       .map((item: any) => {
+      //         if (!item.hasOwnProperty("paymentMethod")) {
+      //           let elm = `  <tr>
+      //            <td style="border: 1px solid black; padding: 5px">
+      //              <div style="display: flex; gap: 20px; align-items: center;">
+      //                <div style="max-width: 80px; margin-right: 10px">
+      //                  <img
+      //                    src=${item.image}
+      //                    alt=""
+      //                    style="max-width: 80px; background-color: #d9d9d9"
+      //                  />
+      //                </div>
+      //                <span >${item.name}</span>
+      //              </div>
+      //            </td>
+      //            <td style="border: 1px solid black; padding: 5px">${item.qty}</td>
+      //            <td style="border: 1px solid black; padding: 5px">₦${item.subTotal}</td>
+      //          </tr>`;
+
+      //           return elm;
+      //         }
+      //       })
+      //       .join("");
+
+      //     const content = `
+      // <body style="font-family: sans-serif; padding: 0; max-width: 600px; margin: 0 auto">
+      //   <header
+      //     style="
+      //       text-align: center;
+      //       background-color:#d9d9d9;
+      //       display: flex;
+      //       align-items: center;
+      //       margin: 0 auto;
+      //       justify-content: center;
+      //     ">
+      //     <img
+      //       src="http://res.cloudinary.com/dynkejvim/image/upload/v1700235033/stewart/puv5v0bxq3zrojoqy2hn.png"
+      //       alt="Stewart Collection Logo"
+      //       style="max-width: 200px; max-width: 60px" />
+      //     <h1>
+      //       <span style="color: #000000; font-size: 18px">STEWART COLLECTION</span>
+      //     </h1>
+      //   </header>
+      //   <main style="max-width: 500px; margin: 0 auto">
+      //     <div
+      //      style="
+      //         margin: 0 auto;
+      //         text-align: center;
+      //       ">
+      //       <img
+      //         src="http://res.cloudinary.com/dynkejvim/image/upload/v1700249023/stewart/z7v1mytna75vjy7huccr.png"  style="
+      //         margin-top: 20px;
+
+      //       "
+      //         alt="" />
+
+      //       <h2>Thank You!</h2>
+      //     </div>
+      //     <p style="margin-bottom: 20px">
+      //       Your order has been confirmed. You can view your order details below.
+      //     </p>
+      //     <p>Order ID: ${visitorOrder.id}</p>
+      //     <table
+      //       class="order-details"
+      //       style="border-collapse: collapse; width: 100%; overflow-x: scroll;">
+      //       <thead>
+      //         <tr>
+      //           <th style="border: 1px solid black; padding: 5px">Item</th>
+      //           <th style="border: 1px solid black; padding: 5px">Quantity</th>
+      //           <th style="border: 1px solid black; padding: 5px">Price</th>
+      //         </tr>
+      //       </thead>
+      //       <tbody>
+      //       ${items}
+      //       </tbody>
+      //     </table>
+      //     <p style="margin-bottom: 10px; font-weight: bold;">Shipping: ₦${shipping}</p>
+
+      //     <p style="margin-bottom: 10px; font-weight: bold;">Total: ₦${total}</p>
+      //       <p style="margin-bottom: 10px; font-weight: bold;">Arrival Date: ${currentDate.toLocaleDateString(
+      //         "en-UK"
+      //       )}</p>
+      //     <p style="margin-bottom: 10px; font-weight: bold;">Name: ${name}</p>
+      //     <p style="margin-bottom: 10px; font-weight: bold;">
+      //       Address: ${address}
+      //     </p>
+      //     <p style="margin-bottom: 10px; font-weight: bold">Email: ${email}</p>
+      //   </main>
+      //   <footer style="text-align: center; margin-top: 20px">
+      //     <p>Copyright &copy; ${new Date().getFullYear()} Stewart Collection</p>
+      //   </footer>
+      // </body>
+
+      //     `;
+      //     const subject = "Your Order Status";
+
+      // if (
+      //   visitorOrder.status === "SUCCESS" ||
+      //   visitorOrder.status === "PAY ON DELIVERY"
+      // ) {
+      //   const mail = await sendEmail(
+      //     content,
+      //     visitorOrder?.email as string,
+      //     subject
+      //   );
+
+      //   res.status(StatusCodes.OK).json({
+      //     message: "Order placed successfully",
+      //     visitorOrder,
+      //   });
+      // } else {
+      //   res.status(StatusCodes.BAD_REQUEST).json({
+      //     message: "Your Order was not successful",
+      //   });
+      // }
+    } catch (error) {
+      next(error);
+    }
+  }
+);

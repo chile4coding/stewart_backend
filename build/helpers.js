@@ -81,19 +81,15 @@ const sendEmail = function (content, to, subject) {
             html: content,
         };
         try {
-            const transport = (0, nodemailer_1.createTransport)({
-                host: "mail.privateemail.com",
-                port: 465,
-                secure: true,
-                auth: {
+            const transport = (0, nodemailer_1.createTransport)(Object.assign(Object.assign({}, (process.env.isGmail
+                ? { service: "gmail" }
+                : { host: "mail.privateemail.com" })), { port: 465, secure: true, auth: {
                     user: process.env.EMAIL,
                     pass: process.env.MAIL_PASSWORD,
-                },
-                tls: {
+                }, tls: {
                     // do not fail on invalid certs
                     rejectUnauthorized: false,
-                },
-            });
+                } }));
             const info = yield transport.sendMail(mailOption);
             return info;
         }
@@ -109,7 +105,7 @@ function reqTwoFactorAuth() {
         const token = speakeasy_1.default.totp({
             secret: secret.base32,
             encoding: "base32",
-            step: 240
+            step: 240,
         });
         return { token, secret };
     });

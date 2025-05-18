@@ -5,12 +5,14 @@ import {
   getCategory,
   getColors,
   getProduct,
+  getSingleProduct,
   getSizes,
 } from "../controller/admin/product.controller.admin";
 // import auth from "../middleware/auth";
 import {
-    getAllOrder,
-    getOrder,
+  createOrderWithCard,
+  getAllOrder,
+  getOrder,
   getUserOrder,
   registeredUserCreateOrder,
   visitorCreateOrder,
@@ -27,10 +29,12 @@ router.post("/get_track_order", getOrder);
 router.post("/get_all_order", auth, getAllOrder);
 router.post("/get_user_order", auth, getUserOrder);
 router.post("/create_order_user", auth, registeredUserCreateOrder);
+router.post("/create_order_user_with_card", auth, createOrderWithCard);
+router.post("/create_order_visitor_with_card", createOrderWithCard);
 router.post("/update_review", auth, updateReview);
 
+router.get("/product/:id", getSingleProduct);
+
 // ?addmin get items
-
-
 
 export const productRoute = router;

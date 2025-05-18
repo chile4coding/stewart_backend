@@ -91,15 +91,10 @@ router.post(
     body("address").notEmpty(),
     body("country").notEmpty(),
     body("phone").notEmpty(),
-
   ],
- updateProfile
+  updateProfile
 );
-router.post(
-  "/update_user_pics",
-  auth,
- uploadUserProfilePics
-);
+router.post("/update_user_pics", auth, uploadUserProfilePics);
 router.get("/get_user", auth, getUser);
 router.get("/get_saved_items", auth, getSavedItems);
 router.delete("/delete_saved_item", auth, deleteSavedItem);

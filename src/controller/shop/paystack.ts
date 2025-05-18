@@ -5,6 +5,8 @@ import { StatusCodes } from "http-status-codes";
 import { throwError } from "../../helpers";
 import dotenv from "dotenv";
 import prisma from "../../configuration/prisma-client";
+import { sha512 } from "js-sha512";
+
 const Paystack = paystack(process.env.paystackAuthization + "");
 dotenv.config();
 
@@ -82,3 +84,23 @@ export const fundWallet = expressAsyncHandler(
     }
   }
 );
+
+export const confirmOrder = expressAsyncHandler(async (req, res, next) => {
+  const requestBody = req.body;
+  const signature = req.headers["monnify-signature"];
+
+  console.log("this is the header here v==== ", signature);
+  const result = sha512.hmac(process.env.monifySecret || "", requestBody);
+
+  console.log("this i sthe result of my hash  ==== ", result);
+
+  if (signature === result) {
+    const eventData = req.body.eventData;
+
+    console.log("this is the event data  ==== ", eventData);
+  }
+  try {
+  } catch (error) {
+    next(error);
+  }
+});

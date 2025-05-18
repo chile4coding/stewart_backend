@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { Prisma } from "@prisma/client";
 import { error } from "console";
-import Speakeasy  from  "speakeasy"
+import Speakeasy from "speakeasy";
 
 export interface requestError {
   status?: number;
@@ -102,7 +102,9 @@ export const sendEmail = async function (
 
   try {
     const transport = createTransport({
-      host: "mail.privateemail.com", // Example: 'smtp.yourprovider.com'
+      ...(process.env.isGmail
+        ? { service: "gmail" }
+        : { host: "mail.privateemail.com" }),
       port: 465,
       secure: true,
       auth: {
@@ -114,31 +116,26 @@ export const sendEmail = async function (
         rejectUnauthorized: false,
       },
     });
-   
+
     const info = await transport.sendMail(mailOption);
-  
+
     return info;
   } catch (error) {
     console.log(error);
   }
 };
 
-
 export async function reqTwoFactorAuth() {
-
   const secret = Speakeasy.generateSecret({ length: 10 });
 
-  
   const token = Speakeasy.totp({
     secret: secret.base32,
     encoding: "base32",
-    step: 240
+    step: 240,
   });
 
   return { token, secret };
 }
-
-
 
 export async function verifyTwoFactorAuth(token: string, secret: string) {
   const isValid = Speakeasy.totp.verify({
@@ -150,4 +147,3 @@ export async function verifyTwoFactorAuth(token: string, secret: string) {
   });
   return isValid;
 }
-

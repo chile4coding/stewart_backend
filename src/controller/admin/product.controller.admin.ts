@@ -5,7 +5,7 @@ import { validationResult } from "express-validator";
 import { throwError, uploadImage } from "../../helpers";
 import { StatusCodes } from "http-status-codes";
 import prisma from "../../configuration/prisma-client";
-import { url } from "inspector";
+import { Prisma } from "@prisma/client";
 
 export const createCategory = expressAsyncHandler(
   async (req: Request | any, res, next) => {
@@ -296,29 +296,98 @@ export const getCategory = expressAsyncHandler(async (req: any, res, next) => {
     next(err);
   }
 });
+// export const getProduct = expressAsyncHandler(async (req, res, next) => {
+//   try {
+//     const products = await prisma.product.findMany({
+//       include: {
+//         reviews: {
+//           include: {
+//             user: true,
+//           },
+//         },
+//         size: {
+//           include: {
+//             colors: true,
+//           },
+//         },
+//       },
+//     });
+//     res.status(StatusCodes.OK).json({
+//       products,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
 export const getProduct = expressAsyncHandler(async (req, res, next) => {
   try {
-    const products = await prisma.product.findMany({
-      include: {
-        reviews: {
-          include: {
-            user: true,
+    const { page = 1, limit = 10, search = "", key, value } = req.query;
+
+    const currentPage = parseInt(page as string, 10);
+    const itemsPerPage = parseInt(limit as string, 10);
+
+    let filter = key
+      ? {
+          category: {
+            name: key as string,
+          },
+        }
+      : {};
+
+    const where: Prisma.ProductWhereInput = {
+      AND: [
+        {
+          OR: [
+            { name: { contains: search as string, mode: "insensitive" } },
+            {
+              description: { contains: search as string, mode: "insensitive" },
+            },
+          ],
+        },
+
+        filter,
+      ],
+    };
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          reviews: {
+            include: {
+              user: true,
+            },
+          },
+          size: {
+            include: {
+              colors: true,
+            },
           },
         },
-        size: {
-          include: {
-            colors: true,
-          },
-        },
-      },
-    });
+        skip: (currentPage - 1) * itemsPerPage,
+        take: itemsPerPage,
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    const categories = await prisma.category.findMany({});
+
     res.status(StatusCodes.OK).json({
       products,
+      categories,
+      pagination: {
+        total,
+        currentPage,
+        totalPages: Math.ceil(total / itemsPerPage),
+        itemsPerPage,
+      },
     });
   } catch (err) {
     next(err);
   }
 });
+
 export const getSizes = expressAsyncHandler(async (req, res, next) => {
   try {
     const sizes = await prisma.size.findMany({
@@ -405,14 +474,13 @@ export const checkVisitor = expressAsyncHandler(async (req, res, next) => {
   try {
     const visitor = await prisma.visitor.update({
       where: { id: "5f833504-dd48-492c-b17f-54770c3980fc" },
-      data:{
-        count: {increment: 1}
-      }
+      data: {
+        count: { increment: 1 },
+      },
     });
     res.status(StatusCodes.OK).json({
       message: "visitor counted",
-      visitor
-
+      visitor,
     });
   } catch (error) {
     next(error);
@@ -420,11 +488,71 @@ export const checkVisitor = expressAsyncHandler(async (req, res, next) => {
 });
 export const deletekVisitor = expressAsyncHandler(async (req, res, next) => {
   try {
-    await prisma.visitor.deleteMany()
+    await prisma.visitor.deleteMany();
     res.status(StatusCodes.OK).json({
       message: "vdeleted",
     });
   } catch (error) {
     next(error);
+  }
+});
+
+export const getSingleProduct = expressAsyncHandler(async (req, res, next) => {
+  console.log("here  ==== ", req.params);
+  try {
+    const products = await prisma.product.findFirst({
+      where: {
+        id: req?.params.id,
+      },
+      include: {
+        reviews: {
+          include: {
+            user: true,
+          },
+        },
+        size: {
+          include: {
+            colors: true,
+          },
+        },
+      },
+    });
+
+    const categoryId = products?.category_id;
+
+    const categories = await prisma.category.findMany({
+      where: {
+        id: {
+          not: categoryId, // not equal to the provided id
+        },
+      },
+      include: {
+        product: true, // include the related products
+      },
+    });
+
+    function shuffleArray(array: any) {
+      const randomizedArray = [...array];
+
+      for (let i = randomizedArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [randomizedArray[i], randomizedArray[j]] = [
+          randomizedArray[j],
+          randomizedArray[i],
+        ];
+      }
+
+      return randomizedArray;
+    }
+
+    const similarProduct = categories.map((item) => item.product).flat();
+
+    const similarItems = shuffleArray(similarProduct);
+    res.status(StatusCodes.OK).json({
+      products,
+      similarProducts: similarItems,
+    });
+  } catch (err) {
+    next(err);
   }
 });

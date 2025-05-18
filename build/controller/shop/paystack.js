@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fundWallet = exports.verifyPayment = void 0;
+exports.confirmOrder = exports.fundWallet = exports.verifyPayment = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const paystack_1 = __importDefault(require("paystack"));
 const express_validator_1 = require("express-validator");
@@ -20,6 +20,7 @@ const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const dotenv_1 = __importDefault(require("dotenv"));
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
+const js_sha512_1 = require("js-sha512");
 const Paystack = (0, paystack_1.default)(process.env.paystackAuthization + "");
 dotenv_1.default.config();
 exports.verifyPayment = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,7 +45,7 @@ exports.verifyPayment = (0, express_async_handler_1.default)((req, res, next) =>
                     amount: currentAmount,
                 },
             });
-            res.redirect("https://stewart-frontend-chile4coding.vercel.app/my_account");
+            res.redirect("https://www.stewartcollection.store/my_account");
         }
         else {
             (0, helpers_1.throwError)("payment failed", http_status_codes_1.StatusCodes.BAD_REQUEST, true);
@@ -86,6 +87,22 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
         res.status(http_status_codes_1.StatusCodes.OK).json({
             data: initPayment.data.authorization_url,
         });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.confirmOrder = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const requestBody = req.body;
+    const signature = req.headers["monnify-signature"];
+    console.log("this is the header here v==== ", signature);
+    const result = js_sha512_1.sha512.hmac(process.env.monifySecret || "", requestBody);
+    console.log("this i sthe result of my hash  ==== ", result);
+    if (signature === result) {
+        const eventData = req.body.eventData;
+        console.log("this is the event data  ==== ", eventData);
+    }
+    try {
     }
     catch (error) {
         next(error);

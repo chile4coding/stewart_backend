@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletekVisitor = exports.checkVisitor = exports.removeAProductColor = exports.removeAProduct = exports.getColors = exports.getSizes = exports.getProduct = exports.getCategory = exports.createOrUpdateClothColor = exports.createOrUpdateSize = exports.createOrUpdateProduct = exports.createCategory = void 0;
+exports.getSingleProduct = exports.deletekVisitor = exports.checkVisitor = exports.removeAProductColor = exports.removeAProduct = exports.getColors = exports.getSizes = exports.getProduct = exports.getCategory = exports.createOrUpdateClothColor = exports.createOrUpdateSize = exports.createOrUpdateProduct = exports.createCategory = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const express_validator_1 = require("express-validator");
 const helpers_1 = require("../../helpers");
@@ -268,24 +268,84 @@ exports.getCategory = (0, express_async_handler_1.default)((req, res, next) => _
         next(err);
     }
 }));
+// export const getProduct = expressAsyncHandler(async (req, res, next) => {
+//   try {
+//     const products = await prisma.product.findMany({
+//       include: {
+//         reviews: {
+//           include: {
+//             user: true,
+//           },
+//         },
+//         size: {
+//           include: {
+//             colors: true,
+//           },
+//         },
+//       },
+//     });
+//     res.status(StatusCodes.OK).json({
+//       products,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 exports.getProduct = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const products = yield prisma_client_1.default.product.findMany({
-            include: {
-                reviews: {
-                    include: {
-                        user: true,
+        const { page = 1, limit = 10, search = "", key, value } = req.query;
+        const currentPage = parseInt(page, 10);
+        const itemsPerPage = parseInt(limit, 10);
+        let filter = key
+            ? {
+                category: {
+                    name: key,
+                },
+            }
+            : {};
+        const where = {
+            AND: [
+                {
+                    OR: [
+                        { name: { contains: search, mode: "insensitive" } },
+                        {
+                            description: { contains: search, mode: "insensitive" },
+                        },
+                    ],
+                },
+                filter,
+            ],
+        };
+        const [products, total] = yield Promise.all([
+            prisma_client_1.default.product.findMany({
+                where,
+                include: {
+                    reviews: {
+                        include: {
+                            user: true,
+                        },
+                    },
+                    size: {
+                        include: {
+                            colors: true,
+                        },
                     },
                 },
-                size: {
-                    include: {
-                        colors: true,
-                    },
-                },
-            },
-        });
+                skip: (currentPage - 1) * itemsPerPage,
+                take: itemsPerPage,
+            }),
+            prisma_client_1.default.product.count({ where }),
+        ]);
+        const categories = yield prisma_client_1.default.category.findMany({});
         res.status(http_status_codes_1.StatusCodes.OK).json({
             products,
+            categories,
+            pagination: {
+                total,
+                currentPage,
+                totalPages: Math.ceil(total / itemsPerPage),
+                itemsPerPage,
+            },
         });
     }
     catch (err) {
@@ -375,12 +435,12 @@ exports.checkVisitor = (0, express_async_handler_1.default)((req, res, next) => 
         const visitor = yield prisma_client_1.default.visitor.update({
             where: { id: "5f833504-dd48-492c-b17f-54770c3980fc" },
             data: {
-                count: { increment: 1 }
-            }
+                count: { increment: 1 },
+            },
         });
         res.status(http_status_codes_1.StatusCodes.OK).json({
             message: "visitor counted",
-            visitor
+            visitor,
         });
     }
     catch (error) {
@@ -396,5 +456,58 @@ exports.deletekVisitor = (0, express_async_handler_1.default)((req, res, next) =
     }
     catch (error) {
         next(error);
+    }
+}));
+exports.getSingleProduct = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here  ==== ", req.params);
+    try {
+        const products = yield prisma_client_1.default.product.findFirst({
+            where: {
+                id: req === null || req === void 0 ? void 0 : req.params.id,
+            },
+            include: {
+                reviews: {
+                    include: {
+                        user: true,
+                    },
+                },
+                size: {
+                    include: {
+                        colors: true,
+                    },
+                },
+            },
+        });
+        const categoryId = products === null || products === void 0 ? void 0 : products.category_id;
+        const categories = yield prisma_client_1.default.category.findMany({
+            where: {
+                id: {
+                    not: categoryId, // not equal to the provided id
+                },
+            },
+            include: {
+                product: true, // include the related products
+            },
+        });
+        function shuffleArray(array) {
+            const randomizedArray = [...array];
+            for (let i = randomizedArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [randomizedArray[i], randomizedArray[j]] = [
+                    randomizedArray[j],
+                    randomizedArray[i],
+                ];
+            }
+            return randomizedArray;
+        }
+        const similarProduct = categories.map((item) => item.product).flat();
+        const similarItems = shuffleArray(similarProduct);
+        res.status(http_status_codes_1.StatusCodes.OK).json({
+            products,
+            similarProducts: similarItems,
+        });
+    }
+    catch (err) {
+        next(err);
     }
 }));

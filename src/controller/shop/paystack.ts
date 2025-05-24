@@ -89,15 +89,10 @@ export const confirmOrder = expressAsyncHandler(async (req, res, next) => {
   const requestBody = req.body;
   const signature = req.headers["monnify-signature"];
 
-  console.log("this is the header here v==== ", signature);
   const result = sha512.hmac(process.env.monifySecret || "", requestBody);
-
-  console.log("this i sthe result of my hash  ==== ", result);
 
   if (signature === result) {
     const eventData = req.body.eventData;
-
-    console.log("this is the event data  ==== ", eventData);
   }
   try {
   } catch (error) {

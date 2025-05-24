@@ -430,6 +430,6 @@ export const uploadUserProfilePics = expressAsyncHandler(
   }
 );
 
-cron.schedule(" 1 * *  * * * ", async () => {
-  console.log("hello this is nice");
-});
+// cron.schedule(" 1 * *  * * * ", async () => {
+//   console.log("hello this is nice");
+// });

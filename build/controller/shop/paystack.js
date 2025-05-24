@@ -95,12 +95,9 @@ exports.fundWallet = (0, express_async_handler_1.default)((req, res, next) => __
 exports.confirmOrder = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const requestBody = req.body;
     const signature = req.headers["monnify-signature"];
-    console.log("this is the header here v==== ", signature);
     const result = js_sha512_1.sha512.hmac(process.env.monifySecret || "", requestBody);
-    console.log("this i sthe result of my hash  ==== ", result);
     if (signature === result) {
         const eventData = req.body.eventData;
-        console.log("this is the event data  ==== ", eventData);
     }
     try {
     }

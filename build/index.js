@@ -25,7 +25,8 @@ const route_1 = __importDefault(require("./route/route"));
 const server_2 = require("./server/server");
 dotenv_1.default.config();
 server_1.app.use((0, cors_1.default)({
-    origin: "*",
+    origin: process.env.FRONTEND_URL,
+    optionsSuccessStatus: 200,
 }));
 server_1.app.use(body_parser_1.default.json());
 server_1.app.use(body_parser_1.default.urlencoded({ extended: false }));

@@ -18,7 +18,6 @@ const express_validator_1 = require("express-validator");
 const http_status_codes_1 = require("http-status-codes");
 const helpers_1 = require("../../helpers");
 const prisma_client_1 = __importDefault(require("../../configuration/prisma-client"));
-const node_cron_1 = __importDefault(require("node-cron"));
 exports.createUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req.body);
     if (!errors.isEmpty()) {
@@ -375,6 +374,6 @@ exports.uploadUserProfilePics = (0, express_async_handler_1.default)((req, res, 
         next(error);
     }
 }));
-node_cron_1.default.schedule(" 1 * *  * * * ", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("hello this is nice");
-}));
+// cron.schedule(" 1 * *  * * * ", async () => {
+//   console.log("hello this is nice");
+// });
